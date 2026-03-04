@@ -152,16 +152,13 @@ Each bonus feature is worth up to 1% of the final grade (max 1% total).
 
 The following package organization is recommended to maintain separation of concerns:
 
-| Package | Responsibility |
-|---------|---------------|
-| `com.splendor.model` | Core domain entities: `Card`, `Noble`, `Gem`, `Player`, `Board`, `Deck`, etc. |
-| `com.splendor.engine` | Game logic and rules: `GameEngine`, `TurnManager`, `ActionValidator`, `WinChecker`. |
-| `com.splendor.ai` | Computer player strategy: `AIPlayer`, `Strategy` interface, implementations. |
-| `com.splendor.view` | Console display: `GameView`, `BoardRenderer`, `PlayerStatusRenderer`. |
-| `com.splendor.controller` | Input handling and game flow: `GameController`, `InputParser`. |
-| `com.splendor.config` | Configuration loading: `ConfigLoader`, reading `config.properties`. |
-| `com.splendor.data` | Data loading: `CardLoader`, `NobleLoader` (parse CSV/data files). |
-| `com.splendor.util` | Shared utilities and constants. |
+| Package               | Responsibility                                                                         |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `com.splendor.model`  | Domain entities: `Card`, `Noble`, `Gem` (enum), `Player`, `Board`, `Deck`, `TokenBank` |
+| `com.splendor.engine` | Game flow and rules: `GameEngine`, `ActionValidator`, `WinChecker`, `InputParser`      |
+| `com.splendor.ai`     | AI strategy: `AIPlayer`, `Strategy` interface, `GreedyStrategy`                        |
+| `com.splendor.view`   | Console display: `GameView`, `BoardRenderer`, `PlayerStatusRenderer`                   |
+| `com.splendor.config` | All file loading: `ConfigLoader`, `CardLoader`, `NobleLoader`                          |
 
 ### 6.2 Key Design Principles
 
