@@ -158,6 +158,8 @@ enum GemColor {
 
 
 ## UML Class Diagram
+
+```mermaid
 classDiagram
     %% Packages
     namespace core {
@@ -280,3 +282,4 @@ classDiagram
         +draw() T
         +add(card: T) void
     }
+```
