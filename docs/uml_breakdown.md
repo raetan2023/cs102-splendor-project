@@ -155,3 +155,128 @@ enum GemColor {
 |`Board`|`Noble`|Tracking available visitors|
 |`Action`|`Board`|Validation and execution context|
 |`GameEngine`|`Action`|Processing player moves|
+
+
+## UML Class Diagram
+classDiagram
+    %% Packages
+    namespace core {
+        class GameEngine
+        class Board
+        class GemPile
+        class Action {
+            <<abstract>>
+            +isValid(player: Player, board: Board) boolean
+            +takeAction(player: Player, board: Board) void
+        }
+        class TakeGems
+        class PurchaseCard
+        class ReserveCard
+    }
+
+    namespace model {
+        class GemColor {
+            <<enumeration>>
+            WHITE
+            BLUE
+            GREEN
+            RED
+            BLACK
+            GOLD
+        }
+        class DevelopmentCard
+        class Noble
+        class Deck~T~
+    }
+
+    namespace player {
+        class Player
+        class PlayerAssets
+    }
+
+    %% Relationships - Core
+    GameEngine *-- Board : composition
+    GameEngine o-- Player : players
+    Board *-- GemPile : gemBank
+    Board o-- Noble : visibleNobles
+    Board o-- Deck : aggregates
+
+    Action <|-- TakeGems
+    Action <|-- PurchaseCard
+    Action <|-- ReserveCard
+
+    %% Relationships - Player
+    Player *-- PlayerAssets : wallet
+    Player o-- DevelopmentCard : reservedCards
+    Player o-- Noble : visitedBy
+
+    %% Functional Dependencies (Uses)
+    Action ..> Board : uses
+    Action ..> Player : uses
+    Player ..> Noble : checks affordability
+    DevelopmentCard ..> GemColor : has bonus
+    Noble ..> GemColor : requirements
+
+    %% Class Definitions
+    class GameEngine {
+        -List~Player~ players
+        ~Board gameBoard
+        +startGame() void
+        +nextTurn() void
+    }
+
+    class GemPile {
+        -int[] supply
+        +canTakeTwo(colorIndex: int) boolean
+    }
+
+    class Board {
+        -GemPile gemBank
+        -List~Noble~ visibleNobles
+        +revealCard(tier: int) void
+    }
+
+    class DevelopmentCard {
+        -int tier
+        -int points
+        -GemColor bonus
+        +getBonusColor() int
+        +getPrestigePoints() int
+    }
+
+    class Noble {
+        -List~GemColor~ requirementColors
+        -List~int~ requirementQty
+        -int points
+        +needs(p: Player) boolean
+    }
+
+    class Player {
+        -String name
+        -int prestigePoints
+        -PlayerAssets wallet
+        -List~DevelopmentCard~ reservedCards
+        -List~Noble~ visitedBy
+        +addPoints(points: int) void
+        +reserve(card: DevelopmentCard) void
+        +canAfford(noble: Noble) boolean
+        +addNoble(noble: Noble) void
+    }
+
+    class PlayerAssets {
+        -int[] tokens
+        -int[] bonuses
+        +addToken(colorIndex: int, qty: int) void
+        +addBonus(colorIndex: int) void
+        +getNumTokens() int
+        +goldNeeded(cost: int[]) int
+        +aboveTenTokens() boolean
+        +getExcessCount() int
+    }
+
+    class Deck~T~ {
+        -List~T~ cards
+        +shuffle() void
+        +draw() T
+        +add(card: T) void
+    }
