@@ -1,30 +1,16 @@
 
-## Table of Contents
-
-- [Package: `com.splendor.core`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendorcore)
-- [Package: `com.splendor.model`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendormodel)
-- [Package: `com.splendor.player`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendorplayer)
-- [Structural Relationships](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#structural-relationships)
-- [Functional Dependencies](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#functional-dependencies)
-
----
-
 ## Package: `com.splendor.core`
 
 > Contains the core game loop and the board state.
 
----
-
 ### `GameEngine`
 
-|Visibility|Member|Type|
-|:-:|:--|:--|
-|`~`|`players`|`List<Player>`|
-|`~`|`gameBoard`|`Board`|
-|`+`|`startGame()`|`void`|
-|`+`|`nextTurn()`|`void`|
-
----
+| Visibility | Member        | Type           |
+| :--------: | :------------ | :------------- |
+|    `-`     | `players`     | `List<Player>` |
+|    `~`     | `gameBoard`   | `Board`        |
+|    `+`     | `startGame()` | `void`         |
+|    `+`     | `nextTurn()`  | `void`         |
 
 ### `GemPile`
 
@@ -32,8 +18,6 @@
 |:-:|:--|:--|
 |`-`|`supply`|`int[]`|
 |`+`|`canTakeTwo(colorIndex: int)`|`boolean`|
-
----
 
 ### `Board`
 
@@ -43,16 +27,12 @@
 |`-`|`visibleNobles`|`List<Noble>`|
 |`+`|`revealCard(tier: int)`|`void`|
 
----
-
 ### `Action` _(Abstract)_
 
 |Visibility|Method|Returns|
 |:-:|:--|:--|
 |`+`|`isValid(player: Player, board: Board)`|`boolean`|
 |`+`|`takeAction(player: Player, board: Board)`|`void`|
-
----
 
 ### Action Implementations
 
@@ -71,12 +51,9 @@ Action  (abstract)
 ```
 
 ---
-
 ## Package: `com.splendor.model`
 
 > Contains physical game components and entities.
-
----
 
 ### `GemColor` _(enum)_
 
@@ -91,7 +68,6 @@ enum GemColor {
 }
 ```
 
----
 
 ### `DevelopmentCard`
 
@@ -103,8 +79,6 @@ enum GemColor {
 |`+`|`getBonusColor()`|`int`|
 |`+`|`getPrestigePoints()`|`int`|
 
----
-
 ### `Noble`
 
 |Visibility|Member|Type|
@@ -113,8 +87,6 @@ enum GemColor {
 |`-`|`requirementQty`|`List<int>`|
 |`-`|`points`|`int`|
 |`+`|`needs(p: Player)`|`boolean`|
-
----
 
 ### `Deck<T>`
 
@@ -131,8 +103,6 @@ enum GemColor {
 
 > Manages player state, assets, and inventory.
 
----
-
 ### `PlayerAssets`
 
 |Visibility|Member|Type|
@@ -145,8 +115,6 @@ enum GemColor {
 |`+`|`goldNeeded(cost: int[])`|`int`|
 |`+`|`aboveTenTokens()`|`boolean`|
 |`+`|`getExcessCount()`|`int`|
-
----
 
 ### `Player`
 
