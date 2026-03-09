@@ -1,124 +1,189 @@
-# Splendor UML Class Diagram Breakdown
 
-This document outlines the architecture for the Splendor game implementation, organized by package and structural relationships.
+## Table of Contents
 
----
-
-## 1. Package: `com.splendor.core`
-*Contains the core game loop and the board state.*
-
-### **GameEngine**
-- **Attributes:**
-    - `players: List<Player>`
-    - `gameBoard: Board`
-- **Methods:**
-    - `+ startGame(): void`
-    - `+ nextTurn(): void`
-
-### **GemPile**
-- **Attributes:**
-    - `- supply: int[]`
-- **Methods:**
-    - `+ canTakeTwo(colorIndex: int): boolean`
-
-### **Board**
-- **Attributes:**
-    - `- gemBank: GemPile`
-    - `- visibleNobles: List<Noble>`
-- **Methods:**
-    - `+ revealCard(tier: int): void`
-
-### **Action** `<<Abstract>>`
-- **Methods:**
-    - `+ isValid(player: Player, board: Board): boolean`
-    - `+ takeAction(player: Player, board: Board): void`
-
-### **Action Implementations**
-*Includes: **TakeGems**, **PurchaseCard**, and **ReserveCard***
-- **Methods:** Each implements `isValid()` and `takeAction()`.
+- [Package: `com.splendor.core`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendorcore)
+- [Package: `com.splendor.model`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendormodel)
+- [Package: `com.splendor.player`](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#package-comsplendorplayer)
+- [Structural Relationships](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#structural-relationships)
+- [Functional Dependencies](https://claude.ai/chat/26cbe27f-061d-4c48-8022-68405bcb8584#functional-dependencies)
 
 ---
 
-## 2. Package: `com.splendor.model`
-*Contains physical game components and entities.*
+## Package: `com.splendor.core`
 
-### **GemColor** `<<enum>>`
-- **Values:** `WHITE`, `BLUE`, `GREEN`, `RED`, `BLACK`, `GOLD`
-
-### **DevelopmentCard**
-- **Attributes:**
-    - `- tier: int`
-    - `- points: int`
-    - `- bonus: GemColor`
-- **Methods:**
-    - `+ getBonusColor(): int`
-    - `+ getPrestigePoints(): int`
-
-### **Noble**
-- **Attributes:**
-    - `- requirementColors: List<GemColor>`
-    - `- requirementQty: List<int>`
-    - `- points: int`
-- **Methods:**
-    - `+ needs(p: Player): boolean`
-
-### **Deck<T>**
-- **Attributes:**
-    - `- cards: List<T>`
-- **Methods:**
-    - `+ shuffle(): void`
-    - `+ draw(): T`
-    - `+ add(card: T): void`
+> Contains the core game loop and the board state.
 
 ---
 
-## 3. Package: `com.splendor.player`
-*Manages player state, assets, and inventory.*
+### `GameEngine`
 
-### **PlayerAssets**
-- **Attributes:**
-    - `- tokens: int[]`
-    - `- bonuses: int[]`
-- **Methods:**
-    - `+ addToken(colorIndex: int, qty: int): void`
-    - `+ addBonus(colorIndex: int): void`
-    - `+ getNumTokens(): int`
-    - `+ goldNeeded(cost: int[]): int`
-    - `+ aboveTenTokens(): boolean`
-    - `+ getExcessCount(): int`
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`~`|`players`|`List<Player>`|
+|`~`|`gameBoard`|`Board`|
+|`+`|`startGame()`|`void`|
+|`+`|`nextTurn()`|`void`|
 
-### **Player**
-- **Attributes:**
-    - `- name: String`
-    - `- prestigePoints: int`
-    - `- wallet: PlayerAssets`
-    - `- reservedCards: List<DevelopmentCard>`
-    - `- visitedBy: List<Noble>`
-- **Methods:**
-    - `+ addPoints(points: int): void`
-    - `+ reserve(card: DevelopmentCard): void`
-    - `+ canAfford(noble: Noble): boolean`
-    - `+ addNoble(noble: Noble): void`
+---
+
+### `GemPile`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`supply`|`int[]`|
+|`+`|`canTakeTwo(colorIndex: int)`|`boolean`|
+
+---
+
+### `Board`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`gemBank`|`GemPile`|
+|`-`|`visibleNobles`|`List<Noble>`|
+|`+`|`revealCard(tier: int)`|`void`|
+
+---
+
+### `Action` _(Abstract)_
+
+|Visibility|Method|Returns|
+|:-:|:--|:--|
+|`+`|`isValid(player: Player, board: Board)`|`boolean`|
+|`+`|`takeAction(player: Player, board: Board)`|`void`|
+
+---
+
+### Action Implementations
+
+Concrete classes: **`TakeGems`**, **`PurchaseCard`**, **`ReserveCard`**
+
+Each class `extends Action` and provides full implementations of:
+
+- `isValid(player: Player, board: Board): boolean`
+- `takeAction(player: Player, board: Board): void`
+
+```
+Action  (abstract)
+├── TakeGems
+├── PurchaseCard
+└── ReserveCard
+```
+
+---
+
+## Package: `com.splendor.model`
+
+> Contains physical game components and entities.
+
+---
+
+### `GemColor` _(enum)_
+
+```java
+enum GemColor {
+    WHITE,
+    BLUE,
+    GREEN,
+    RED,
+    BLACK,
+    GOLD
+}
+```
+
+---
+
+### `DevelopmentCard`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`tier`|`int`|
+|`-`|`points`|`int`|
+|`-`|`bonus`|`GemColor`|
+|`+`|`getBonusColor()`|`int`|
+|`+`|`getPrestigePoints()`|`int`|
+
+---
+
+### `Noble`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`requirementColors`|`List<GemColor>`|
+|`-`|`requirementQty`|`List<int>`|
+|`-`|`points`|`int`|
+|`+`|`needs(p: Player)`|`boolean`|
+
+---
+
+### `Deck<T>`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`cards`|`List<T>`|
+|`+`|`shuffle()`|`void`|
+|`+`|`draw()`|`T`|
+|`+`|`add(card: T)`|`void`|
+
+---
+
+## Package: `com.splendor.player`
+
+> Manages player state, assets, and inventory.
+
+---
+
+### `PlayerAssets`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`tokens`|`int[]`|
+|`-`|`bonuses`|`int[]`|
+|`+`|`addToken(colorIndex: int, qty: int)`|`void`|
+|`+`|`addBonus(colorIndex: int)`|`void`|
+|`+`|`getNumTokens()`|`int`|
+|`+`|`goldNeeded(cost: int[])`|`int`|
+|`+`|`aboveTenTokens()`|`boolean`|
+|`+`|`getExcessCount()`|`int`|
+
+---
+
+### `Player`
+
+|Visibility|Member|Type|
+|:-:|:--|:--|
+|`-`|`name`|`String`|
+|`-`|`prestigePoints`|`int`|
+|`-`|`wallet`|`PlayerAssets`|
+|`-`|`reservedCards`|`List<DevelopmentCard>`|
+|`-`|`visitedBy`|`List<Noble>`|
+|`+`|`addPoints(points: int)`|`void`|
+|`+`|`reserve(card: DevelopmentCard)`|`void`|
+|`+`|`canAfford(noble: Noble)`|`boolean`|
+|`+`|`addNoble(noble: Noble)`|`void`|
 
 ---
 
 ## Structural Relationships
 
-| Relationship Type | Class A (Owner) | Class B (Target) | Logic |
-| :--- | :--- | :--- | :--- |
-| **Composition** | `GameEngine` | `Board` | Board exists only within an active game. |
-| **Composition** | `Board` | `GemPile` | GemPile is a non-independent part of the Board. |
-| **Aggregation** | `Board` | `Deck` | Decks exist independently; Board holds them during play. |
-| **Implementation** | `TakeGems`, etc. | `Action` | Concrete classes providing logic for the interface. |
+|Relationship|Owner|Target|Notes|
+|:--|:--|:--|:--|
+|**Composition**|`GameEngine`|`Board`|`Board` exists only within an active game|
+|**Composition**|`Board`|`GemPile`|`GemPile` is a non-independent part of `Board`|
+|**Aggregation**|`Board`|`Deck`|`Deck` exists independently; `Board` holds it during play|
+|**Implementation**|`TakeGems`, `PurchaseCard`, `ReserveCard`|`Action`|Concrete classes providing logic for the abstract base|
 
 ---
 
 ## Functional Dependencies
-*“Uses-a” relationships where one class requires knowledge of another.*
 
-- **Player** references `Noble` & `DevelopmentCard` (for affordability).
-- **DevelopmentCard** references `GemColor` (for bonus type).
-- **Noble** references `GemColor` (for cost requirements).
-- **Board** references `Noble` (to track available visitors).
-- **Action** references `Board` (for validation and execution).
-- **GameEngine** references `Action` (to process moves).
+> _"Uses-a" relationships where one class requires knowledge of another._
+
+|Class|Depends On|Reason|
+|:--|:--|:--|
+|`Player`|`Noble`, `DevelopmentCard`|Affordability checks and inventory|
+|`DevelopmentCard`|`GemColor`|Bonus gem type|
+|`Noble`|`GemColor`|Cost requirement colors|
+|`Board`|`Noble`|Tracking available visitors|
+|`Action`|`Board`|Validation and execution context|
+|`GameEngine`|`Action`|Processing player moves|
