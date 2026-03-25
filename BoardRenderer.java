@@ -9,7 +9,7 @@ public class BoardRenderer{
         renderTokens(board);
 
         // Print nobles
-        renderNobles(board);
+        renderNobles(board); 
 
         System.out.println("====================");
     }
@@ -54,18 +54,10 @@ public class BoardRenderer{
     }
 
     private String formatCard(DevelopmentCard card){
-        // eg: [Tier1: +1 Diamond | 1VP]
-        return ("[" + card.getTier() + ": +" + card.getBonus() 
-        + " | " + card.getPoints() + "VP]");
+        return card.toString();
     }
 
     private String formatNoble(Noble noble) {
-        // eg: [3 Diamonds, 3 Sapphires | 3 VP]
-        StringBuilder sb = new StringBuilder("[");
-        noble.getRequirements().forEach((type, amount) -> sb.append(amount).append(type).append(", "));
-        // remove trailing comma
-        sb.setLength(sb.length() - 2); 
-        sb.append(" | ").append(noble.getPoints()).append(" VP]");
-        return sb.toString();
+        return noble.toString();
     }
 }
