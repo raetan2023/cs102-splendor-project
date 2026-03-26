@@ -17,7 +17,7 @@
 |Visibility|Member|Type|
 |:-:|:--|:--|
 |`-`|`supply`|`int[]`|
-|`+`|`canTakeTwo(colorIndex: int)`|`boolean`|
+|`+`|`canTakeTwo()`|`boolean`|
 
 ### `Board`
 
