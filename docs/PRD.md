@@ -154,11 +154,12 @@ The following package organization is recommended to maintain separation of conc
 
 | Package               | Responsibility                                                                         |
 | --------------------- | -------------------------------------------------------------------------------------- |
-| `com.splendor.model`  | Domain entities: `Card`, `Noble`, `Gem` (enum), `Player`, `Board`, `Deck`, `TokenBank` |
-| `com.splendor.engine` | Game flow and rules: `GameEngine`, `ActionValidator`, `WinChecker`, `InputParser`      |
+| `com.splendor.core`   | Game flow and core actions: `GameEngine`, `Board`, `Action` (abstract), etc.           |
+| `com.splendor.model`  | Domain entities: `GemColor` (enum), `DevelopmentCard`, `Noble`, `Deck`                 |
+| `com.splendor.player` | Player data: `Player`, `PlayerAssets`                                                  |
 | `com.splendor.ai`     | AI strategy: `AIPlayer`, `Strategy` interface, `GreedyStrategy`                        |
 | `com.splendor.view`   | Console display: `GameView`, `BoardRenderer`, `PlayerStatusRenderer`                   |
-| `com.splendor.config` | All file loading: `ConfigLoader`, `CardLoader`, `NobleLoader`                          |
+| `com.splendor.config` | File loading: `ConfigLoader`, `CardLoader`, `NobleLoader`                              |
 
 ### 6.2 Key Design Principles
 
@@ -197,12 +198,14 @@ data.nobles=data/nobles.csv
 
 - `compile.sh` — compiles all Java source files into the `classes/` directory.
 - `run.sh` — runs the application.
-- `src/` — all Java source files.
-- `classes/` — left empty (populated after `compile.sh` runs).
-- `media/` — image and audio files (if any; empty for console app).
-- `lib/` — external JAR dependencies (if not using Maven).
 - `config.properties` — externalized game configuration.
+- `README.md` — project introduction and instructions.
+- `src/` — all Java source files.
 - `data/` — card and noble data files (CSV or similar).
+- `classes/` — left empty (populated after `compile.sh` runs).
+- `lib/` — external JAR dependencies (if not using Maven).
+- `media/` — image and audio files (if any; empty for console app).
+- `docs/` — project documentation including PRD, UML breakdown, git guide, and workflow.
 - `GX-TY.pptx` (or `.pdf`) — presentation slides including AI Use appendix.
 
 ### 7.2 Submission Details
