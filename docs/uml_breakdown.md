@@ -76,8 +76,14 @@ enum GemColor {
 |`-`|`tier`|`int`|
 |`-`|`points`|`int`|
 |`-`|`bonus`|`GemColor`|
+|`-`|`cost`|`int[]`|
+|`+`|`getTier()`|`int`|
 |`+`|`getBonusColor()`|`int`|
 |`+`|`getPrestigePoints()`|`int`|
+|`+`|`getCost()`|`int[]`|
+|`-`|`formatCost()`|`String`|
+|`+`|`toString()`|`String`|
+
 
 ### `Noble`
 
