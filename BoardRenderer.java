@@ -31,6 +31,7 @@ public class BoardRenderer{
         }
     }
 
+//may need to make changes to name TokenType after this func is made available in the board
     public void renderTokens(Board board){
         System.out.println("Tokens:");
 
