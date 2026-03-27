@@ -26,6 +26,7 @@ Standard indexing for all token arrays: [0] white [1] blue [2] green [3] red [4]
 |    `+`     | `takeGems()`             | `void`    |
 |    `+`     | `returnGems()`           | `void`    |
 |    `+`     | `getSupply()`            | `int`     |
+
 no need setSupply() because the supply is handled through takeGems() and returnGems()
 
 ### `Board`
