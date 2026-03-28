@@ -14,18 +14,22 @@ import com.splendor.player.Player;
 import com.splendor.player.PlayerAssets;
 import com.splendor.model.DevelopmentCard;
 
+import java.util.List;
+
 public class PurchaseCard extends Action {
     private DevelopmentCard card;
+    private boolean isReserved;
 
-    public PurchaseCard(DevelopmentCard card) {
+    public PurchaseCard(DevelopmentCard card, boolean isReserved) {
         this.card = card;
+        this.isReserved = isReserved;
     }
 
     @Override
     public boolean isValid(Player player, Board board) {
         int[] cost = card.getCost();
         int goldRequired = player.getWallet().goldNeeded(cost);
-        int playerGold = player.getWallet().getTokens()[5];
+        int playerGold = player.getWallet().getGoldTokens(); // getTokens()[5] is no longer guaranteed, let's use proper method
         return playerGold >= goldRequired;
     }
 
@@ -33,16 +37,27 @@ public class PurchaseCard extends Action {
     public void takeAction(Player player, Board board) {
         PlayerAssets assets = player.getWallet();
 
-        // Add card to owned cards
+        // 1. Remove card from the board or reserved hand
+        if (isReserved) {
+            player.getReservedCards().remove(card);
+        } else {
+            List<DevelopmentCard> tierCards = board.getVisibleCards().get(card.getTier());
+            if (tierCards != null) {
+                tierCards.remove(card);
+                board.revealCard(card.getTier()); // Reveal a new card to automatically replace it
+            }
+        }
+
+        // 2. Add card to owned cards
         player.addOwnedCard(card);
 
-        // Add prestige points
+        // 3. Add prestige points
         player.addPoints(card.getPrestigePoints()); 
         
-        // Add permanent bonus
-        assets.addBonus(card.getBonusColor()); 
+        // 4. Add permanent bonus
+        assets.addBonus(card.getBonusColor().ordinal()); // getBonusColor returns GemColor. need ordinal
 
-        // Return tokens to the board supply
+        // 5. Deduct tokens and return to the board supply
         int[] cost = card.getCost();
         int[] playerTokens = assets.getTokens();
         int[] bonuses = assets.getBonuses();
@@ -54,19 +69,24 @@ public class PurchaseCard extends Action {
             if (remainder > 0) {
                 if (playerTokens[i] >= remainder) {
                     playerTokens[i] -= remainder;
-                    gemBank[i].setSupply(gemBank[i].getSupply() + remainder);
+                    gemBank[i].returnGems(remainder);
                 } else {
                     int goldNeeded = remainder - playerTokens[i];
-                    gemBank[i].setSupply(gemBank[i].getSupply() + playerTokens[i]);
-                    playerTokens[i] = 0;
+                    if (playerTokens[i] > 0) {
+                        gemBank[i].returnGems(playerTokens[i]);
+                        playerTokens[i] = 0;
+                    }
                     
-                    playerTokens[5] -= goldNeeded;
-                    board.setGoldSupply(board.getGoldSupply() + goldNeeded);
+                    // Deduct gold
+                    for (int g = 0; g < goldNeeded; g++) {
+                        assets.useGoldToken();
+                        board.returnGold(1);
+                    }
                 }
             }
         }
 
-        // Apply deducted tokens back
+        // Apply deducted regular tokens back
         assets.setTokens(playerTokens);
     }
 }

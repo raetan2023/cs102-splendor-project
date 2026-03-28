@@ -65,7 +65,7 @@ public class TakeGems extends Action {
         for (int i = 0; i < gemsToTake.length; i++) {
             if (gemsToTake[i] > 0) {
                 wallet.addToken(i, gemsToTake[i]);
-                gemBank[i].setSupply(gemBank[i].getSupply() - gemsToTake[i]);
+                gemBank[i].takeGems(gemsToTake[i]);
             }
         }
 
@@ -84,9 +84,9 @@ public class TakeGems extends Action {
             for (int i = 0; i < currentTokens.length; i++) {
                 currentTokens[i] -= discarded[i];
                 if (i == 5) {
-                    board.setGoldSupply(board.getGoldSupply() + discarded[i]);
+                    board.returnGold(discarded[i]);
                 } else {
-                    gemBank[i].setSupply(gemBank[i].getSupply() + discarded[i]);
+                    gemBank[i].returnGems(discarded[i]);
                 }
             }
             wallet.setTokens(currentTokens);

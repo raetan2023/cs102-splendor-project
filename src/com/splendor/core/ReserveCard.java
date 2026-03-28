@@ -9,6 +9,8 @@ package com.splendor.core;
 import com.splendor.player.Player;
 import com.splendor.model.DevelopmentCard;
 
+import java.util.List;
+
 public class ReserveCard extends Action {
     private DevelopmentCard card;
 
@@ -23,11 +25,18 @@ public class ReserveCard extends Action {
 
     @Override
     public void takeAction(Player player, Board board) {
+        // Remove from board if it's there
+        List<DevelopmentCard> tierCards = board.getVisibleCards().get(card.getTier());
+        if (tierCards != null && tierCards.contains(card)) {
+            tierCards.remove(card);
+            board.revealCard(card.getTier()); // Reveal replacement
+        }
+
         player.reserve(card);
         
         if (board.getGoldSupply() > 0) { 
-            player.getWallet().addToken(5, 1);
-            board.setGoldSupply(board.getGoldSupply() - 1);
+            player.getWallet().addGoldToken(); 
+            board.takeGold(1);
         }
     }
 }
