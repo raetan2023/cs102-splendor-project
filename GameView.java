@@ -1,3 +1,5 @@
+package com.splendor.view;
+
 import java.util.Scanner;
 
 public class GameView {

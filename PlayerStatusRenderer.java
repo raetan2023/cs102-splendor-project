@@ -1,3 +1,5 @@
+package com.splendor.view;
+
 public class PlayerStatusRenderer{
     public void renderPlayer(Player player){
         //status of 1 specific player
@@ -28,14 +30,14 @@ public class PlayerStatusRenderer{
     }
 
     private String formatTokens(Player player) {
-        Map<TokenType, Integer> tokens = player.getTokens();
+        Map<GemColor, Integer> tokens = player.getTokens();
         String result = "";
 
-        for (TokenType type : TokenType.values()) {
-            result += type + ": " + tokens.get(type) + " | ";
+        for (GemColor color : GemColor.values()) {
+            result += color + ": " + tokens.get(color) + " | ";
         }
 
-        // Remove the last " | " if needed
+        // Remove trailing " | "
         if (result.length() >= 3) {
             result = result.substring(0, result.length() - 3);
         }
