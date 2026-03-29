@@ -1,13 +1,18 @@
-package ai;
+package com.splendor.ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import model.DevelopmentCard;
-import model.GemColor;
-import player.Player;
+import com.splendor.core.Action;
+import com.splendor.core.Board;
+import com.splendor.core.PurchaseCard;
+import com.splendor.core.ReserveCard;
+import com.splendor.core.TakeGems;
+import com.splendor.model.DevelopmentCard;
+import com.splendor.model.GemColor;
+import com.splendor.player.Player;
 
 public class GreedyStrategy implements Strategy {
 
@@ -15,28 +20,29 @@ public class GreedyStrategy implements Strategy {
     private static final int MAX_GEM_PICK = 3;
 
     @Override
-    public Decision chooseAction(Player player, List<DevelopmentCard> visibleCards, Map<GemColor, Integer> availableGems) {
+    public Action chooseAction(Player player, Board board) {
+        List<DevelopmentCard> visibleCards = getAllVisibleCards(board);
         DevelopmentCard bestAffordable = findBestAffordableCard(player, visibleCards);
         if (bestAffordable != null) {
-            return Decision.purchase(bestAffordable);
+            return new PurchaseCard(bestAffordable, false);
         }
 
         DevelopmentCard bestReservedAffordable = findBestAffordableCard(player, player.getReservedCards());
         if (bestReservedAffordable != null) {
-            return Decision.purchase(bestReservedAffordable);
+            return new PurchaseCard(bestReservedAffordable, true);
         }
 
         DevelopmentCard bestCard = findBestCard(visibleCards);
         if (bestCard != null && player.getReservedCards().size() < MAX_RESERVED_CARDS) {
-            return Decision.reserve(bestCard);
+            return new ReserveCard(bestCard);
         }
 
-        List<GemColor> gemsToTake = chooseGemColors(player, visibleCards, availableGems);
-        if (!gemsToTake.isEmpty()) {
-            return Decision.takeGems(gemsToTake);
+        int[] gemsToTake = chooseGemsToTake(player, visibleCards, board);
+        if (hasAnyGemSelection(gemsToTake)) {
+            return new TakeGems(gemsToTake);
         }
 
-        return Decision.pass();
+        return null;
     }
 
     private DevelopmentCard findBestAffordableCard(Player player, List<DevelopmentCard> cards) {
@@ -98,31 +104,44 @@ public class GreedyStrategy implements Strategy {
         return tokens.get(GemColor.GOLD) >= goldNeeded;
     }
 
-    private List<GemColor> chooseGemColors(Player player, List<DevelopmentCard> visibleCards, Map<GemColor, Integer> availableGems) {
+    private int[] chooseGemsToTake(Player player, List<DevelopmentCard> visibleCards, Board board) {
         DevelopmentCard targetCard = findClosestCard(player, visibleCards);
         if (targetCard == null) {
-            return fallbackGemChoice(availableGems);
+            return fallbackGemChoice(board);
         }
 
         List<GemColor> priorities = buildGemPriority(player, targetCard);
-        List<GemColor> selected = new ArrayList<>();
+        int[] selection = new int[5];
+        int selectedCount = 0;
+
+        if (!priorities.isEmpty()) {
+            GemColor topPriority = priorities.get(0);
+            int topNeed = gemNeed(player, targetCard, topPriority);
+            int topIndex = topPriority.ordinal();
+
+            if (topNeed >= 2 && board.getGemBank()[topIndex].canTakeTwo()) {
+                selection[topIndex] = 2;
+                return selection;
+            }
+        }
 
         for (GemColor color : priorities) {
-            if (selected.size() == MAX_GEM_PICK) {
+            if (selectedCount == MAX_GEM_PICK) {
                 break;
             }
 
-            Integer supply = availableGems.get(color);
-            if (supply != null && supply > 0 && color != GemColor.GOLD && !selected.contains(color)) {
-                selected.add(color);
+            int colorIndex = color.ordinal();
+            if (color != GemColor.GOLD && board.getGemBank()[colorIndex].getSupply() > 0 && selection[colorIndex] == 0) {
+                selection[colorIndex] = 1;
+                selectedCount++;
             }
         }
 
-        if (!selected.isEmpty()) {
-            return selected;
+        if (selectedCount > 0) {
+            return selection;
         }
 
-        return fallbackGemChoice(availableGems);
+        return fallbackGemChoice(board);
     }
 
     private DevelopmentCard findClosestCard(Player player, List<DevelopmentCard> visibleCards) {
@@ -190,20 +209,41 @@ public class GreedyStrategy implements Strategy {
         return Math.max(0, discountedCost - tokens.get(color));
     }
 
-    private List<GemColor> fallbackGemChoice(Map<GemColor, Integer> availableGems) {
-        List<GemColor> selected = new ArrayList<>();
+    private int[] fallbackGemChoice(Board board) {
+        int[] selection = new int[5];
+        int selectedCount = 0;
 
-        for (GemColor color : GemColor.values()) {
-            if (selected.size() == MAX_GEM_PICK) {
+        for (int i = 0; i < 5; i++) {
+            if (selectedCount == MAX_GEM_PICK) {
                 break;
             }
 
-            Integer supply = availableGems.get(color);
-            if (color != GemColor.GOLD && supply != null && supply > 0) {
-                selected.add(color);
+            if (board.getGemBank()[i].getSupply() > 0) {
+                selection[i] = 1;
+                selectedCount++;
             }
         }
 
-        return selected;
+        return selection;
+    }
+
+    private boolean hasAnyGemSelection(int[] gemsToTake) {
+        for (int count : gemsToTake) {
+            if (count > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private List<DevelopmentCard> getAllVisibleCards(Board board) {
+        List<DevelopmentCard> visibleCards = new ArrayList<>();
+
+        for (List<DevelopmentCard> tierCards : board.getVisibleCards().values()) {
+            visibleCards.addAll(tierCards);
+        }
+
+        return visibleCards;
     }
 }

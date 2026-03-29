@@ -1,11 +1,8 @@
-package ai;
+package com.splendor.ai;
 
-import java.util.List;
-import java.util.Map;
-
-import model.DevelopmentCard;
-import model.GemColor;
-import player.Player;
+import com.splendor.core.Action;
+import com.splendor.core.Board;
+import com.splendor.player.Player;
 
 public class AIPlayer extends Player {
 
@@ -20,8 +17,8 @@ public class AIPlayer extends Player {
         this.strategy = strategy;
     }
 
-    public Decision chooseAction(List<DevelopmentCard> visibleCards, Map<GemColor, Integer> availableGems) {
-        return strategy.chooseAction(this, visibleCards, availableGems);
+    public Action chooseAction(Board board) {
+        return strategy.chooseAction(this, board);
     }
 
     public Strategy getStrategy() {
