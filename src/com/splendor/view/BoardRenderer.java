@@ -22,7 +22,6 @@ public class BoardRenderer {
         // Print nobles
         renderNobles(board); 
 
-        // System.out.println("*************************");
         for(int i = 0; i <= 100; i++){
             System.out.print("*");
         }

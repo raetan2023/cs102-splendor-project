@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.splendor.core.Board;
+import com.splendor.core.GameEngine;
 import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
@@ -11,6 +12,7 @@ public class GameView {
 
     private BoardRenderer boardRenderer;
     private PlayerStatusRenderer playerRenderer;
+    private GameEngine gameEngine;
 
     // Constructor
     public GameView() {
@@ -19,27 +21,32 @@ public class GameView {
     }
 
     // Displays the FULL game state
-    public void displayGame(Board board, List<Player> players) {
+    // Board board, List<Player> players
+    public void displayGame(Board board, List<Player> players, GameEngine gameEngine) {
         System.out.println("===== SPLENDOR GAME =====");
+
+        displayDivider();
 
         displayBoard(board);
         displayDivider();
-        displayPlayers(players);
 
-        System.out.println("=========================");
+        displayPlayers(players, gameEngine);  
+        displayCurrentPlayer(gameEngine.getCurrentPlayer());
+
+        displayFinish();
     }
 
     // Displays everything for a single turn
-    public void displayTurn(Board board, List<Player> players, Player currentPlayer) {
+    public void displayTurn(Board board, List<Player> players, GameEngine gameEngine) {
         System.out.println("===== CURRENT TURN =====");
 
-        displayCurrentPlayer(currentPlayer);
+        displayCurrentPlayer(gameEngine.getCurrentPlayer());
         displayDivider();
 
         displayBoard(board);
         displayDivider();
 
-        displayPlayers(players);
+        displayPlayers(players, gameEngine);
 
         System.out.println("========================");
     }
@@ -49,14 +56,15 @@ public class GameView {
         boardRenderer.renderBoard(board);
     }
 
-    // Displays all players
-    public void displayPlayers(List<Player> players) {
-        playerRenderer.renderAllPlayers(players);
+    // Displays all players and highlights the current player
+    public void displayPlayers(List<Player> players, GameEngine gameEngine) {
+        Player currentPlayer = gameEngine.getCurrentPlayer();
+        playerRenderer.renderAllPlayers(players, currentPlayer);
     }
 
     // Displays current player's turn
     public void displayCurrentPlayer(Player player) {
-        System.out.println("Current Player: " + player.getName());
+        System.out.println("Current Turn: " + player.getName());
     }
 
     // Displays a general message
@@ -128,6 +136,18 @@ public class GameView {
 
     // Displays a divider line
     public void displayDivider() {
-        System.out.println("----------------------------------");
+        // System.out.println("----------------------------------");
+        for(int i = 0; i <= 100; i++){
+            System.out.print("*");
+        }
+        System.out.println();
+    }
+
+    public void displayFinish() {
+        // System.out.println("----------------------------------");
+        for(int i = 0; i <= 100; i++){
+            System.out.print("=");
+        }
+        System.out.println();
     }
 }

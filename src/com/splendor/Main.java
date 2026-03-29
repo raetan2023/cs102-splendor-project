@@ -54,7 +54,8 @@ public class Main {
 
         // 5. Initialize GameView & Display Initial State
         GameView view = new GameView();
-        view.displayGame(engine.getGameBoard(), engine.getPlayers());
+        // view.displayGame(engine.getGameBoard(), engine.getPlayers());
+        view.displayGame(engine.getGameBoard(), engine.getPlayers(), engine);
 
         System.out.println("\nSplendor setup complete! Ready to start the game loop.");
 
