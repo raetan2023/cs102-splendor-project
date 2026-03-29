@@ -89,7 +89,7 @@ public class GameView {
                     try {
                         GemColor color = colors[i];
 
-                        int owned = player.getWallet().getToken(color);
+                        int owned = player.getTokenCount(color);
 
                         System.out.print("Enter amount for " + color + ": ");
                         int input = scanner.nextInt();

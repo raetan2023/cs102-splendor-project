@@ -3,6 +3,7 @@ package com.splendor.view;
 import java.util.List;
 import java.util.Map;
 
+import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
@@ -13,12 +14,12 @@ public class PlayerStatusRenderer {
         System.out.println("Player: " + player.getName());
         System.out.println("Points: " + player.getPrestigePoints());
         System.out.println("Tokens: " + formatTokens(player));
-        System.out.println("Cards: " + formatCards(player.getCards()));
+        System.out.println("Cards: " + formatCards(player.getOwnedCards()));
         System.out.println("Reserved Cards: " + formatCards(player.getReservedCards()));
         System.out.println("-----------------------------");
     }
 
-    public void renderAllPayers(List<Player> players) {
+    public void renderAllPlayers(List<Player> players) {
         // Display status of ALL players
         System.out.println("=== Players Status ===");
 
@@ -51,11 +52,11 @@ public class PlayerStatusRenderer {
         return result;
     }
 
-    private String formatCards(List<Card> cards) {
+    private String formatCards(List<DevelopmentCard> cards) {
         String result = "";
 
-        for (Card card : cards) {
-            result += "[" + card.getTier() + ": +" + card.getBonus() + " | " + card.getPoints() + " VP] ";
+        for (DevelopmentCard card : cards) {
+            result += "[" + card.getTier() + ": +" + card.getBonusColor() + " | " + card.getPrestigePoints() + " VP] ";
         }
 
         // Remove trailing space if needed
