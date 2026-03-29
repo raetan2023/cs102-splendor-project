@@ -1,4 +1,10 @@
 package com.splendor.model;
 
-public enum GemColor {
+public enum  GemColor {
+    WHITE,
+    BLUE,
+    GREEN,
+    RED,
+    BLACK,
+    GOLD
 }
