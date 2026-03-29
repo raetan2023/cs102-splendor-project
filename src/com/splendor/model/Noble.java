@@ -1,7 +1,6 @@
 package com.splendor.model;
 
-import com.splendor.player.*;
-import java.util.List;
+import player.Player;
 
 public class Noble {
     private String name;
