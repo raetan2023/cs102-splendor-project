@@ -26,15 +26,19 @@ public class BoardRenderer {
 
     public void renderCards(Board board){
         // from tiers 1 to 3
+        Map<Integer, List<DevelopmentCard>> allVisibleCards = board.getVisibleCards(); // <-- board keeps track of revealed cards
+        
         for (int tier = 1; tier <= 3; tier++) {
             System.out.print("Tier " + tier + ": ");
 
             // Get revealed cards for this tier
-            List<DevelopmentCard> visibleCards = board.getVisibleCards(tier); // <-- board keeps track of revealed cards
+            List<DevelopmentCard> visibleCards = allVisibleCards.get(tier);
 
             // Print each card nicely
-            for (DevelopmentCard card : visibleCards) {
-                System.out.print(formatCard(card) + " ");
+            if (visibleCards != null) {
+                for (DevelopmentCard card : visibleCards) {
+                    System.out.print(formatCard(card) + " ");
+                }
             }
 
             System.out.println(); // %n per tier
