@@ -1,7 +1,9 @@
 #!/bin/bash
+# Move to the directory where this script is located
+cd "$(dirname "$0")"
 
-# Default main class
-MAIN_CLASS=${1:-"com.splendor.Main"}
+# Remove carriage returns from the argument if present
+MAIN_CLASS=$(echo "${1:-com.splendor.Main}" | tr -d '\r')
 
-echo "Starting Splendor..."
+echo "Starting Splendor with: $MAIN_CLASS"
 java -cp classes "$MAIN_CLASS"

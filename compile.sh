@@ -8,7 +8,7 @@ echo "Compiling Java files..."
 find src -name "*.java" > sources.txt
 
 # Compile the found files
-javac -d classes @sources.txt
+javac --release 11 -d classes @sources.txt
 
 if [ $? -eq 0 ]; then
     echo "Compilation successful!"

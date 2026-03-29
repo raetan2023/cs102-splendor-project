@@ -10,6 +10,7 @@ import com.splendor.model.Noble;
 import com.splendor.player.Player;
 import com.splendor.view.GameView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,9 +20,18 @@ public class Main {
 
         // 1. Load Data
         CardLoader cardLoader = new CardLoader();
-        List<DevelopmentCard> tier1 = cardLoader.loadCards("data/cards_level1.csv");
-        List<DevelopmentCard> tier2 = cardLoader.loadCards("data/cards_level2.csv");
-        List<DevelopmentCard> tier3 = cardLoader.loadCards("data/cards_level3.csv");
+        List<DevelopmentCard> allCards = cardLoader.loadCards("data/development_cards.csv");
+
+        // Split cards by tier
+        List<DevelopmentCard> tier1 = new ArrayList<>();
+        List<DevelopmentCard> tier2 = new ArrayList<>();
+        List<DevelopmentCard> tier3 = new ArrayList<>();
+
+        for (DevelopmentCard card : allCards) {
+            if (card.getTier() == 1) tier1.add(card);
+            else if (card.getTier() == 2) tier2.add(card);
+            else if (card.getTier() == 3) tier3.add(card);
+        }
 
         NobleLoader nobleLoader = new NobleLoader();
         List<Noble> nobles = nobleLoader.loadNobles("data/nobles.csv");
@@ -47,7 +57,7 @@ public class Main {
         view.displayGame(engine.getGameBoard(), engine.getPlayers());
 
         System.out.println("\nSplendor setup complete! Ready to start the game loop.");
-        
+
         // TODO: Start your main scanner loop here to take turns
     }
 }

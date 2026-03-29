@@ -28,8 +28,8 @@ public class CardLoader {
 
                 try {
                     int tier = Integer.parseInt(fields[0].trim());
-                    int points = Integer.parseInt(fields[1].trim());
-                    GemColor bonus = GemColor.valueOf(fields[2].trim().toUpperCase());
+                    GemColor bonus = GemColor.valueOf(fields[1].trim().toUpperCase());
+                    int points = Integer.parseInt(fields[2].trim());
 
                     // create array for card cost
                     // standard index: 0=WHITE, 1=BLUE, 2=GREEN, 3=RED, 4=BLACK
