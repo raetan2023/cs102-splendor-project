@@ -1,4 +1,4 @@
-package player;
+package com.splendor.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,9 +6,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import model.DevelopmentCard;
-import model.GemColor;
-import model.Noble;
+import com.splendor.model.DevelopmentCard;
+import com.splendor.model.GemColor;
+import com.splendor.model.Noble;
 
 public class Player {
 
@@ -71,21 +71,19 @@ public class Player {
     }
 
     public List<DevelopmentCard> getOwnedCards() {
-        return Collections.unmodifiableList(ownedCards);
+        return ownedCards;
     }
 
     public List<DevelopmentCard> getReservedCards() {
-        return Collections.unmodifiableList(reservedCards);
+        return reservedCards;
     }
 
     public List<Noble> getVisitedBy() {
-        return Collections.unmodifiableList(visitedBy);
+        return visitedBy;
     }
 
     public void addOwnedCard(DevelopmentCard card) {
         ownedCards.add(card);
-        wallet.addBonus(toColorIndex(card.getBonusColor()));
-        addPoints(card.getPrestigePoints());
     }
 
     public boolean reserveCard(DevelopmentCard card) {

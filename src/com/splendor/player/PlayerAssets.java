@@ -1,4 +1,4 @@
-package player;
+package com.splendor.player;
 
 public class PlayerAssets {
 
@@ -53,6 +53,14 @@ public class PlayerAssets {
 
     public int[] getTokens() {
         return tokens.clone();
+    }
+
+    public void setTokens(int[] tokens) {
+        if (tokens == null || tokens.length != 5) {
+            throw new IllegalArgumentException("Tokens must have exactly 5 entries.");
+        }
+
+        this.tokens = tokens.clone();
     }
 
     public int getTokens(int colorIndex) {
