@@ -1,15 +1,14 @@
 package com.splendor.view;
 
-import com.splendor.core.*;
-import com.splendor.player.*;
-import com.splendor.model.*;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import com.splendor.model.GemColor;
+import com.splendor.player.Player;
 
 public class PlayerStatusRenderer {
-
-    public void renderPlayer(Player player){
-        //status of 1 specific player
+    public void renderPlayer(Player player) {
+        // status of 1 specific player
         System.out.println("-----------------------------");
         System.out.println("Player: " + player.getName());
         System.out.println("Points: " + player.getPrestigePoints());
@@ -19,21 +18,21 @@ public class PlayerStatusRenderer {
         System.out.println("-----------------------------");
     }
 
-    public void renderAllPayers(List<Player> players){
-        //Display status of ALL players
+    public void renderAllPayers(List<Player> players) {
+        // Display status of ALL players
         System.out.println("=== Players Status ===");
 
         for (Player player : players) {
-            renderPlayer(player);  
+            renderPlayer(player);
         }
 
         System.out.println("======================");
     }
 
-    public void renderScore(Player player){
-        //Display the score for 1 specific player
-        System.out.println(player.getName() + " has " 
-        + player.getPrestigePoints() + " points");
+    public void renderScore(Player player) {
+        // Display the score for 1 specific player
+        System.out.println(player.getName() + " has "
+                + player.getPrestigePoints() + " points");
     }
 
     private String formatTokens(Player player) {
@@ -52,10 +51,10 @@ public class PlayerStatusRenderer {
         return result;
     }
 
-    private String formatCards(List<DevelopmentCard> cards) {
+    private String formatCards(List<Card> cards) {
         String result = "";
 
-        for (DevelopmentCard card : cards) {
+        for (Card card : cards) {
             result += "[" + card.getTier() + ": +" + card.getBonus() + " | " + card.getPoints() + " VP] ";
         }
 

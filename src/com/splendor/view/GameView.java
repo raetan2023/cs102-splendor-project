@@ -1,11 +1,11 @@
 package com.splendor.view;
 
-import com.splendor.core.*;
-import com.splendor.player.*;
-import com.splendor.model.*;
-
-import java.util.*;
+import java.util.List;
 import java.util.Scanner;
+
+import com.splendor.core.Board;
+import com.splendor.model.GemColor;
+import com.splendor.player.Player;
 
 public class GameView {
 
@@ -69,11 +69,11 @@ public class GameView {
         Scanner scanner = new Scanner(System.in);
 
         GemColor[] colors = {
-            GemColor.WHITE,
-            GemColor.BLUE,
-            GemColor.GREEN,
-            GemColor.RED,
-            GemColor.BLACK
+                GemColor.WHITE,
+                GemColor.BLUE,
+                GemColor.GREEN,
+                GemColor.RED,
+                GemColor.BLACK
         };
 
         int[] discard = new int[colors.length];

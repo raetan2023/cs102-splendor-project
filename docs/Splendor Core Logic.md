@@ -77,21 +77,3 @@ Noble check — not an action, not a player choice (unless multiple qualify):
 * If yes, game ends — player with higher prestigePoints wins  
 * Tie-breaker: fewest ownedCards.size() wins
 
-## **Key Gaps to Flag for UML Update**
-
-Before Antigravity generates the classes:
-
-| Gap | Fix needed |
-| :---- | :---- |
-| \`Board\` has no \`visibleCards\` | Add \`Map\<Integer, List\<DevelopmentCard\>\> visibleCards\` |
-| \`Player\` has no \`ownedCards\` | Add \`List\<DevelopmentCard\> ownedCards\` |
-| \`getBonusColor()\` returns \`int\` not \`GemColor\` | Fix return type |
-| \`GameEngine\` has no win check method | Add \`checkWin(): boolean\` |
-| \`GemPile\` only has \`canTakeTwo()\` | Also needs \`takeGems()\`, \`returnGems()\` methods |
-
-Rae to do:  
-GemPile.takeGems(), returnGems() and Board.visibleCards  
-Add checkWin() in GameEngine  
-Add takeGems() and returnGems() in GemPile  
-Add goldSupply (int) in Board. Starts at 5  
-Add visibleCards Map\<Integer, List\<DevelopmentCard\>\> in Board
