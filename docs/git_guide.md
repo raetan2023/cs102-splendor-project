@@ -52,7 +52,12 @@ fix/config-loader
 
 ---
 
-## 3. Day-to-Day Workflow
+## 3. Day-to-Day Workflow 
+
+### Step 0 - fetch from origin to get the latest updates from remote repo ###
+```bash
+git fetch origin
+```
 
 ### Step 1 — Start from an up-to-date `main`
 ```bash
