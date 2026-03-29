@@ -1,4 +1,5 @@
 package com.splendor.config;
 
-public class ConfigLoader {
+public interface ConfigLoader {
+    GameConfig load(String path);
 }
