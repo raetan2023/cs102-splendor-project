@@ -42,10 +42,13 @@ public class Player {
     }
 
     public boolean canAfford(Noble noble) {
-        int[] requirements = noble.getRequirements();
+        List<GemColor> colors = noble.getRequirementColors();
+        List<Integer> qtys = noble.getRequirementQty();
 
-        for (int i = 0; i < requirements.length; i++) {
-            if (wallet.getBonuses(i) < requirements[i]) {
+        for (int i = 0; i < colors.size(); i++) {
+            int requiredQty = qtys.get(i);
+            int colorIndex = toColorIndex(colors.get(i));
+            if (wallet.getBonuses(colorIndex) < requiredQty) {
                 return false;
             }
         }

@@ -1,22 +1,35 @@
 package com.splendor.model;
 
-import player.Player;
+import com.splendor.player.*;
+import java.util.List;
 
 public class Noble {
-    private int[] requirements; // only WHITE, BLUE, GREEN, RED, BLACK used
+    private String name;
+    private List<GemColor> requirementColors;
+    private List<Integer> requirementQty;
     private int points;
 
-    public Noble(int[] requirements, int points) {
-        this.requirements = requirements.clone();
+    public Noble(String name, List<GemColor> requirementColors, List<Integer> requirementQty, int points) {
+        this.name = name;
+        this.requirementColors = requirementColors;
+        this.requirementQty = requirementQty;
         this.points = points;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<GemColor> getRequirementColors() {
+        return requirementColors;
+    }
+
+    public List<Integer> getRequirementQty() {
+        return requirementQty;
     }
 
     public int getPoints() {
         return points;
-    }
-
-    public int[] getRequirements() {
-        return requirements.clone();
     }
 
     public boolean needs(Player p) {
@@ -25,21 +38,15 @@ public class Noble {
 
     @Override
     public String toString() {
-        return "Noble [points=" + points + ", requirements=" + formatRequirements() + "]";
+        return "Noble [name=" + name + ", points=" + points + ", requirements=" + formatRequirements() + "]";
     }
 
     private String formatRequirements() {
-        String result = "";
-
-        for (int i = 0; i < 5; i++) {
-            if (requirements[i] > 0) {
-                if (!result.equals("")) {
-                    result += ", ";
-                }
-                result += GemColor.values()[i] + "=" + requirements[i];
-            }
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < requirementColors.size(); i++) {
+            if (i > 0) result.append(", ");
+            result.append(requirementColors.get(i)).append("=").append(requirementQty.get(i));
         }
-
-        return result;
+        return result.toString();
     }
 }

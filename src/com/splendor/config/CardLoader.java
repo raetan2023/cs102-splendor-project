@@ -31,14 +31,14 @@ public class CardLoader {
                     int points = Integer.parseInt(fields[1].trim());
                     GemColor bonus = GemColor.valueOf(fields[2].trim().toUpperCase());
 
-                    // create map for card cost
-                    Map<GemColor, Integer> cost = new EnumMap<>(GemColor.class);
-                    // with GemColor color as key, and the number parsed respectively as value
-                    cost.put(GemColor.BLACK, Integer.parseInt(fields[3].trim()));
-                    cost.put(GemColor.BLUE, Integer.parseInt(fields[4].trim()));
-                    cost.put(GemColor.GREEN, Integer.parseInt(fields[5].trim()));
-                    cost.put(GemColor.RED, Integer.parseInt(fields[6].trim()));
-                    cost.put(GemColor.WHITE, Integer.parseInt(fields[7].trim()));
+                    // create array for card cost
+                    // standard index: 0=WHITE, 1=BLUE, 2=GREEN, 3=RED, 4=BLACK
+                    int[] cost = new int[5];
+                    cost[GemColor.BLACK.ordinal()] = Integer.parseInt(fields[3].trim());
+                    cost[GemColor.BLUE.ordinal()] = Integer.parseInt(fields[4].trim());
+                    cost[GemColor.GREEN.ordinal()] = Integer.parseInt(fields[5].trim());
+                    cost[GemColor.RED.ordinal()] = Integer.parseInt(fields[6].trim());
+                    cost[GemColor.WHITE.ordinal()] = Integer.parseInt(fields[7].trim());
 
                     // add processed card to cards list 
                     cards.add(new DevelopmentCard(tier, points, bonus, cost));
