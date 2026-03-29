@@ -1,6 +1,6 @@
 package com.splendor.model;
 
-import player.Player;
+import com.splendor.player.*;
 
 public class Noble {
     private int[] requirements; // only WHITE, BLUE, GREEN, RED, BLACK used

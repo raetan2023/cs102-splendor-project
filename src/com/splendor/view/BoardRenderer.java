@@ -30,10 +30,10 @@ public class BoardRenderer {
             System.out.print("Tier " + tier + ": ");
 
             // Get revealed cards for this tier
-            List<Card> visibleCards = board.getVisibleCards(tier); // <-- board keeps track of revealed cards
+            List<DevelopmentCard> visibleCards = board.getVisibleCards(tier); // <-- board keeps track of revealed cards
 
             // Print each card nicely
-            for (Card card : visibleCards) {
+            for (DevelopmentCard card : visibleCards) {
                 System.out.print(formatCard(card) + " ");
             }
 
