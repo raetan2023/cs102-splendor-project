@@ -64,6 +64,10 @@ public class PlayerStatusRenderer {
             result = result.substring(0, result.length() - 1);
         }
 
+        if(result.length() == 0){
+            result += "[0]";
+        }
+
         return result;
     }
 }

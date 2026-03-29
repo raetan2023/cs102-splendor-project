@@ -10,18 +10,23 @@ import java.util.*;
 public class BoardRenderer {
 
     public void renderBoard(Board board){
-        System.out.println("=== Current Board ===");
+        System.out.println("***** Current Board *****");
 
         // Print cards by tier
         renderCards(board);
 
         // Print tokens
         renderTokens(board);
+        System.out.println();
 
         // Print nobles
         renderNobles(board); 
 
-        System.out.println("====================");
+        // System.out.println("*************************");
+        for(int i = 0; i <= 100; i++){
+            System.out.print("*");
+        }
+        System.out.println();
     }
 
     public void renderCards(Board board){
@@ -29,7 +34,8 @@ public class BoardRenderer {
         Map<Integer, List<DevelopmentCard>> allVisibleCards = board.getVisibleCards(); // <-- board keeps track of revealed cards
         
         for (int tier = 1; tier <= 3; tier++) {
-            System.out.print("Tier " + tier + ": ");
+            System.out.print("* Tier " + tier + " *");
+            System.out.println();
 
             // Get revealed cards for this tier
             List<DevelopmentCard> visibleCards = allVisibleCards.get(tier);
@@ -38,15 +44,17 @@ public class BoardRenderer {
             if (visibleCards != null) {
                 for (DevelopmentCard card : visibleCards) {
                     System.out.print(formatCard(card) + " ");
+                    System.out.println();
                 }
             }
 
             System.out.println(); // %n per tier
+            System.out.println();
         }
     }
 
     public void renderTokens(Board board) {
-        System.out.println("Tokens:");
+        System.out.println("* Tokens *");
 
         GemPile[] gemBank = board.getGemBank();
 
@@ -73,9 +81,11 @@ public class BoardRenderer {
     public void renderNobles(Board board){
         List<Noble> nobles = board.getVisibleNobles(); 
 
-        System.out.print("Nobles: ");
+        System.out.print("* Nobles *");
+        System.out.println();
         for (Noble noble : nobles) {
             System.out.print(formatNoble(noble) + " ");
+            System.out.println();
         }
         System.out.println();
     }
