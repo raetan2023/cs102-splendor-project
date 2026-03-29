@@ -1,6 +1,8 @@
 package com.splendor.model;
 
-import player.Player;
+import java.util.List;
+
+import com.splendor.player.Player;
 
 public class Noble {
     private String name;
@@ -43,7 +45,8 @@ public class Noble {
     private String formatRequirements() {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < requirementColors.size(); i++) {
-            if (i > 0) result.append(", ");
+            if (i > 0)
+                result.append(", ");
             result.append(requirementColors.get(i)).append("=").append(requirementQty.get(i));
         }
         return result.toString();
