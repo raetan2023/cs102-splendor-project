@@ -115,7 +115,7 @@ public class Main {
                 case "1": action = promptTakeGems(sc, board, view); break;
                 case "2": action = promptPurchaseCard(sc, player, board, view, engine); break;
                 case "3": action = promptReserveCard(sc, player, board, view); break;
-                default:  view.displayMessage("Enter 1, 2, or 3."); continue;
+                default:  view.displayError("Enter 1, 2, or 3."); continue;
             }
             
             // If action is NOT null, it means the player successfully submitted an action.

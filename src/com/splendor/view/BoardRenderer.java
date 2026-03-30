@@ -17,6 +17,10 @@ public class BoardRenderer {
         System.out.println();
         System.out.println();
 
+        //print legend
+        printLegend();
+        System.out.println();
+
         // Print nobles
         renderNobles(board); 
         System.out.println();
@@ -207,5 +211,10 @@ public class BoardRenderer {
         }
 
         return sb.toString().trim();
+    }
+
+    private void printLegend(){
+        System.out.println("// LEGEND (for Noble & Cards): ");
+        System.out.println("// WHITE = W | BLUE = U | GREEN = G | RED = R | BLACK = K");
     }
 }
