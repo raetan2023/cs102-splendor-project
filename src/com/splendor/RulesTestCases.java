@@ -10,6 +10,7 @@ import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
 import com.splendor.model.Noble;
 import com.splendor.player.Player;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,43 +21,67 @@ public class RulesTestCases {
     private static int failed = 0;
 
     public static void main(String[] args) {
-        System.out.println("========================================");
-        System.out.println(" SPLENDOR RULE TEST CASES (PASS / FAIL) ");
-        System.out.println("========================================");
+        printHeader();
 
-        // 1. Token limits
-        testRuleOf4_AllowsTwoSameWhenSupplyIs4();
-        testRuleOf4_BlocksTwoSameWhenSupplyIs3();
-        testTokenCap_EndOfTurnCannotStayAbove10();
-        testTokenCap_CanTemporarilyGoAbove10AndDiscardBack();
-        testTokenCap_CanDiscardOldTokensNotJustNewOnes();
+        runTokenLimitTests();
+        runReserveTests();
+        runNobleTests();
+        runEndGameTests();
 
-        // 2. Reserving cards & gold
-        testBlindReserve_FromTopOfDeck();
-        testReserveLimit_Max3Cards();
-        testReservedCardCannotBeDiscarded_CurrentDesignCheck();
-        testReserveStillWorksWhenGoldSupplyEmpty();
-        testGoldCannotBeDraftedNormally();
-
-        // 3. Nobles & bonuses
-        testNobleIsAutomaticAtEndOfTurn();
-        testTokensDoNotAttractNobles();
-        testOnlyOneNobleClaimedPerTurnWhenMultipleQualify();
-
-        // 4. Game end & tie-breakers
-        testEndGameShouldFinishCurrentRound_NotImplementedCheck();
-        testTieBreaker_FewestDevelopmentCards();
-        testTieBreaker_SharedVictoryIfStillTied();
-
-        System.out.println();
-        System.out.println("========================================");
-        System.out.println("RESULT: Passed = " + passed + ", Failed = " + failed);
-        System.out.println("========================================");
+        printSummary();
     }
 
     // =========================================================
-    // Helpers
+    // Test Suites
     // =========================================================
+
+    private static void runTokenLimitTests() {
+        System.out.println("\n--- 1. Token Limits ---");
+        testRuleOf4AllowsTwoSameWhenSupplyIs4();
+        testRuleOf4BlocksTwoSameWhenSupplyIs3();
+        testTokenCapDetectedAbove10();
+        testCanTemporarilyGoAbove10ThenDiscardBack();
+        testCanDiscardOldTokensNotJustNewOnes();
+    }
+
+    private static void runReserveTests() {
+        System.out.println("\n--- 2. Reserving Cards & Gold Tokens ---");
+        testBlindReserveFromTopOfDeck();
+        testReserveLimitMax3Cards();
+        testReservedCardCannotBeDiscarded_CurrentDesignCheck();
+        testReserveStillWorksWhenGoldSupplyEmpty();
+        testGoldCannotBeDraftedNormally();
+    }
+
+    private static void runNobleTests() {
+        System.out.println("\n--- 3. Nobles & Bonuses ---");
+        testNobleIsAutomaticAtEndOfTurn();
+        testTokensDoNotAttractNobles();
+        testOnlyOneNobleClaimedPerTurnWhenMultipleQualify();
+    }
+
+    private static void runEndGameTests() {
+        System.out.println("\n--- 4. Game End & Tie-Breakers ---");
+        testEndGameShouldFinishCurrentRound_NotImplementedCheck();
+        testTieBreakerFewestDevelopmentCards();
+        testTieBreakerSharedVictoryIfStillTied();
+    }
+
+    // =========================================================
+    // Output Helpers
+    // =========================================================
+
+    private static void printHeader() {
+        System.out.println("========================================");
+        System.out.println(" SPLENDOR RULE TEST CASES (PASS / FAIL) ");
+        System.out.println("========================================");
+    }
+
+    private static void printSummary() {
+        System.out.println("\n========================================");
+        System.out.println("RESULT: Passed = " + passed + ", Failed = " + failed);
+        System.out.println("========================================");
+    }
 
     private static void pass(String testName) {
         passed++;
@@ -76,35 +101,20 @@ public class RulesTestCases {
         }
     }
 
-    private static void assertEquals(String testName, int expected, int actual) {
-        if (expected == actual) {
-            pass(testName);
-        } else {
-            fail(testName, "expected " + expected + " but got " + actual);
-        }
-    }
+    // =========================================================
+    // Object Builders / Helpers
+    // =========================================================
 
-    private static void assertPlayerTokenCount(String testName, Player player, GemColor color, int expected) {
-        int actual = player.getTokenCount(color);
-        if (actual == expected) {
-            pass(testName);
-        } else {
-            fail(testName, "expected " + color + "=" + expected + " but got " + actual);
-        }
-    }
-
-    private static DevelopmentCard makeCard(int tier, int points, GemColor bonus, int w, int b, int g, int r, int bl) {
-        return new DevelopmentCard(tier, points, bonus, new int[]{w, b, g, r, bl});
+    private static DevelopmentCard makeCard(int tier, int points, GemColor bonus,
+                                            int white, int blue, int green, int red, int black) {
+        return new DevelopmentCard(tier, points, bonus,
+                new int[]{white, blue, green, red, black});
     }
 
     private static Noble makeNoble(String name, int points, GemColor color, int qty) {
         return new Noble(name, Arrays.asList(color), Arrays.asList(qty), points);
     }
 
-    /**
-     * Helper for blind reserve because your current codebase does not yet
-     * have a dedicated Action class for reserving from the top of a deck.
-     */
     private static boolean reserveBlind(Board board, Player player, int tier) {
         if (player.getReservedCards().size() >= 3) {
             return false;
@@ -130,36 +140,18 @@ public class RulesTestCases {
         return true;
     }
 
-    private static class NoOpAction extends Action {
-        @Override
-        public boolean isValid(Player player, Board board) {
-            return true;
-        }
-
-        @Override
-        public void takeAction(Player player, Board board) {
-            // intentionally does nothing
-        }
-    }
-
-    /**
-     * Rule-based winner helper for your requested tie-break tests.
-     * This is NOT wired into your current GameEngine yet.
-     */
     private static List<Player> determineWinnersByOfficialTieBreak(List<Player> players) {
+        List<Player> tiedOnPoints = new ArrayList<>();
         List<Player> winners = new ArrayList<>();
-        int maxPoints = Integer.MIN_VALUE;
 
-        for (Player p : players) {
-            if (p.getPrestigePoints() > maxPoints) {
-                maxPoints = p.getPrestigePoints();
-            }
+        int maxPoints = Integer.MIN_VALUE;
+        for (Player player : players) {
+            maxPoints = Math.max(maxPoints, player.getPrestigePoints());
         }
 
-        List<Player> tiedOnPoints = new ArrayList<>();
-        for (Player p : players) {
-            if (p.getPrestigePoints() == maxPoints) {
-                tiedOnPoints.add(p);
+        for (Player player : players) {
+            if (player.getPrestigePoints() == maxPoints) {
+                tiedOnPoints.add(player);
             }
         }
 
@@ -169,13 +161,13 @@ public class RulesTestCases {
         }
 
         int fewestCards = Integer.MAX_VALUE;
-        for (Player p : tiedOnPoints) {
-            fewestCards = Math.min(fewestCards, p.getOwnedCards().size());
+        for (Player player : tiedOnPoints) {
+            fewestCards = Math.min(fewestCards, player.getOwnedCards().size());
         }
 
-        for (Player p : tiedOnPoints) {
-            if (p.getOwnedCards().size() == fewestCards) {
-                winners.add(p);
+        for (Player player : tiedOnPoints) {
+            if (player.getOwnedCards().size() == fewestCards) {
+                winners.add(player);
             }
         }
 
@@ -183,34 +175,48 @@ public class RulesTestCases {
     }
 
     // =========================================================
+    // Test Support Classes
+    // =========================================================
+
+    private static class NoOpAction extends Action {
+        @Override
+        public boolean isValid(Player player, Board board) {
+            return true;
+        }
+
+        @Override
+        public void takeAction(Player player, Board board) {
+            // do nothing
+        }
+    }
+
+    // =========================================================
     // 1. Token Limits
     // =========================================================
 
-    private static void testRuleOf4_AllowsTwoSameWhenSupplyIs4() {
+    private static void testRuleOf4AllowsTwoSameWhenSupplyIs4() {
         String testName = "Rule of 4: can take 2 same color when stack has 4";
         Board board = new Board();
         Player player = new Player("P1");
 
         TakeGems action = new TakeGems(new int[]{2, 0, 0, 0, 0});
-        boolean valid = action.isValid(player, board);
-
-        assertTrue(testName, valid, "action should be valid when supply is 4");
+        assertTrue(testName, action.isValid(player, board),
+                "action should be valid when supply is 4");
     }
 
-    private static void testRuleOf4_BlocksTwoSameWhenSupplyIs3() {
+    private static void testRuleOf4BlocksTwoSameWhenSupplyIs3() {
         String testName = "Rule of 4: cannot take 2 same color when stack has only 3";
         Board board = new Board();
         Player player = new Player("P1");
 
-        board.getGemBank()[0].takeGems(1); // white goes from 4 -> 3
+        board.getGemBank()[0].takeGems(1);
 
         TakeGems action = new TakeGems(new int[]{2, 0, 0, 0, 0});
-        boolean valid = action.isValid(player, board);
-
-        assertTrue(testName, !valid, "action should be invalid when supply is 3");
+        assertTrue(testName, !action.isValid(player, board),
+                "action should be invalid when supply is 3");
     }
 
-    private static void testTokenCap_EndOfTurnCannotStayAbove10() {
+    private static void testTokenCapDetectedAbove10() {
         String testName = "10-token cap: wallet detects over-limit at end of turn";
         Player player = new Player("P1");
 
@@ -218,50 +224,43 @@ public class RulesTestCases {
         player.addToken(GemColor.BLUE, 5);
         player.addToken(GemColor.GREEN, 1);
 
-        boolean overLimit = player.getWallet().aboveTenTokens();
-
-        assertTrue(testName, overLimit, "player should be detected as above 10 tokens");
+        assertTrue(testName, player.getWallet().aboveTenTokens(),
+                "player should be detected as above 10 tokens");
     }
 
-    private static void testTokenCap_CanTemporarilyGoAbove10AndDiscardBack() {
+    private static void testCanTemporarilyGoAbove10ThenDiscardBack() {
         String testName = "10-token cap: can go above 10 during turn, then discard back to 10";
         Player player = new Player("P1");
 
         player.addToken(GemColor.WHITE, 4);
         player.addToken(GemColor.BLUE, 4);
-        player.addToken(GemColor.GREEN, 2); // total = 10
-
-        // Temporarily go above 10
-        player.addToken(GemColor.RED, 2);   // total = 12
+        player.addToken(GemColor.GREEN, 2);
+        player.addToken(GemColor.RED, 2);
 
         boolean aboveBeforeDiscard = player.getWallet().aboveTenTokens();
 
-        // Simulate discarding 2 tokens back down to 10
         int[] adjusted = player.getWallet().getTokens();
-        adjusted[3] -= 2; // discard the 2 red
+        adjusted[3] -= 2;
         player.getWallet().setTokens(adjusted);
 
-        boolean aboveAfterDiscard = player.getWallet().aboveTenTokens();
-        int total = player.getTotalTokens();
+        boolean correct =
+                aboveBeforeDiscard &&
+                !player.getWallet().aboveTenTokens() &&
+                player.getTotalTokens() == 10;
 
-        assertTrue(testName,
-                aboveBeforeDiscard && !aboveAfterDiscard && total == 10,
+        assertTrue(testName, correct,
                 "player should be allowed to exceed 10 temporarily, then end on exactly 10");
     }
 
-    private static void testTokenCap_CanDiscardOldTokensNotJustNewOnes() {
+    private static void testCanDiscardOldTokensNotJustNewOnes() {
         String testName = "10-token cap: can discard old tokens, not only newly picked tokens";
         Player player = new Player("P1");
 
-        // Old pool
         player.addToken(GemColor.WHITE, 4);
         player.addToken(GemColor.BLUE, 4);
-        player.addToken(GemColor.GREEN, 1); // total = 9
+        player.addToken(GemColor.GREEN, 1);
+        player.addToken(GemColor.RED, 2);
 
-        // Newly picked this turn
-        player.addToken(GemColor.RED, 2);   // total = 11
-
-        // Discard an OLD token (blue), not one of the new red tokens
         int[] adjusted = player.getWallet().getTokens();
         adjusted[1] -= 1; // discard 1 BLUE
         player.getWallet().setTokens(adjusted);
@@ -271,14 +270,15 @@ public class RulesTestCases {
                 player.getTokenCount(GemColor.RED) == 2 &&
                 player.getTokenCount(GemColor.BLUE) == 3;
 
-        assertTrue(testName, correct, "should be able to keep new tokens and discard an older token instead");
+        assertTrue(testName, correct,
+                "should be able to keep new tokens and discard an older token instead");
     }
 
     // =========================================================
     // 2. Reserving Cards & Gold Tokens
     // =========================================================
 
-    private static void testBlindReserve_FromTopOfDeck() {
+    private static void testBlindReserveFromTopOfDeck() {
         String testName = "Blind reserve: can reserve from top of a tier deck";
         Board board = new Board();
         Player player = new Player("P1");
@@ -299,10 +299,11 @@ public class RulesTestCases {
                 player.getWallet().getGoldTokens() == 1 &&
                 board.getGoldSupply() == goldBefore - 1;
 
-        assertTrue(testName, correct, "blind reserve should draw top card from deck and give gold if available");
+        assertTrue(testName, correct,
+                "blind reserve should draw top card from deck and give gold if available");
     }
 
-    private static void testReserveLimit_Max3Cards() {
+    private static void testReserveLimitMax3Cards() {
         String testName = "Reserve limit: cannot have more than 3 reserved cards";
         Player player = new Player("P1");
 
@@ -319,16 +320,10 @@ public class RulesTestCases {
         String testName = "Reserve edge case: reserved card cannot be discarded to make room";
 
         Player player = new Player("P1");
-        DevelopmentCard c1 = makeCard(1, 0, GemColor.WHITE, 0, 0, 0, 0, 0);
-        DevelopmentCard c2 = makeCard(1, 0, GemColor.BLUE, 0, 0, 0, 0, 0);
-        DevelopmentCard c3 = makeCard(1, 0, GemColor.GREEN, 0, 0, 0, 0, 0);
+        player.reserveCard(makeCard(1, 0, GemColor.WHITE, 0, 0, 0, 0, 0));
+        player.reserveCard(makeCard(1, 0, GemColor.BLUE, 0, 0, 0, 0, 0));
+        player.reserveCard(makeCard(1, 0, GemColor.GREEN, 0, 0, 0, 0, 0));
 
-        player.reserveCard(c1);
-        player.reserveCard(c2);
-        player.reserveCard(c3);
-
-        // Current API exposes the mutable reserved list directly.
-        // That means external code can remove a reserved card, which breaks the rule.
         boolean wasAbleToCheat;
         try {
             player.getReservedCards().remove(0);
@@ -349,16 +344,13 @@ public class RulesTestCases {
         Board board = new Board();
         Player player = new Player("P1");
 
-        // Empty the gold supply
         board.takeGold(board.getGoldSupply());
 
         DevelopmentCard card = makeCard(1, 0, GemColor.WHITE, 1, 0, 0, 0, 0);
         board.getVisibleCards().get(1).add(card);
 
         ReserveCard action = new ReserveCard(card);
-        boolean valid = action.isValid(player, board);
-
-        if (!valid) {
+        if (!action.isValid(player, board)) {
             fail(testName, "reserve action should still be valid even when gold is empty");
             return;
         }
@@ -370,7 +362,8 @@ public class RulesTestCases {
                 player.getWallet().getGoldTokens() == 0 &&
                 board.getGoldSupply() == 0;
 
-        assertTrue(testName, correct, "card should be reserved even though no gold is gained");
+        assertTrue(testName, correct,
+                "card should be reserved even though no gold is gained");
     }
 
     private static void testGoldCannotBeDraftedNormally() {
@@ -379,9 +372,8 @@ public class RulesTestCases {
         Player player = new Player("P1");
 
         TakeGems action = new TakeGems(new int[]{0, 0, 0, 0, 0, 1});
-        boolean valid = action.isValid(player, board);
-
-        assertTrue(testName, !valid, "gold should not be draftable via TakeGems");
+        assertTrue(testName, !action.isValid(player, board),
+                "gold should not be draftable via TakeGems");
     }
 
     // =========================================================
@@ -398,8 +390,7 @@ public class RulesTestCases {
         Noble noble = makeNoble("White Noble", 3, GemColor.WHITE, 1);
         board.getVisibleNobles().add(noble);
 
-        // Give permanent bonus, not token
-        p1.getWallet().addBonus(0); // WHITE bonus
+        p1.getWallet().addBonus(0);
 
         GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
         engine.nextTurn(new NoOpAction());
@@ -410,7 +401,8 @@ public class RulesTestCases {
                 p1.getPrestigePoints() == 3 &&
                 board.getVisibleNobles().isEmpty();
 
-        assertTrue(testName, correct, "noble should be claimed automatically after the turn");
+        assertTrue(testName, correct,
+                "noble should be claimed automatically after the turn");
     }
 
     private static void testTokensDoNotAttractNobles() {
@@ -423,7 +415,6 @@ public class RulesTestCases {
         Noble noble = makeNoble("White Noble", 3, GemColor.WHITE, 1);
         board.getVisibleNobles().add(noble);
 
-        // Give token only, no permanent bonus
         p1.addToken(GemColor.WHITE, 5);
 
         GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
@@ -433,7 +424,8 @@ public class RulesTestCases {
                 p1.getVisitedBy().isEmpty() &&
                 board.getVisibleNobles().size() == 1;
 
-        assertTrue(testName, correct, "noble should NOT be claimed using tokens alone");
+        assertTrue(testName, correct,
+                "noble should NOT be claimed using tokens alone");
     }
 
     private static void testOnlyOneNobleClaimedPerTurnWhenMultipleQualify() {
@@ -449,7 +441,7 @@ public class RulesTestCases {
         board.getVisibleNobles().add(noble1);
         board.getVisibleNobles().add(noble2);
 
-        p1.getWallet().addBonus(0); // WHITE bonus
+        p1.getWallet().addBonus(0);
 
         GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
         engine.nextTurn(new NoOpAction());
@@ -458,7 +450,8 @@ public class RulesTestCases {
                 p1.getVisitedBy().size() == 1 &&
                 board.getVisibleNobles().size() == 1;
 
-        assertTrue(testName, correct, "engine should grant only one noble when multiple qualify");
+        assertTrue(testName, correct,
+                "engine should grant only one noble when multiple qualify");
     }
 
     // =========================================================
@@ -475,8 +468,6 @@ public class RulesTestCases {
 
         p1.addPrestigePoints(15);
 
-        // Current engine only has checkWin(), which returns immediately.
-        // It does not track "final round" or ensure equal turns.
         boolean currentCheck = engine.checkWin();
 
         if (currentCheck) {
@@ -486,7 +477,7 @@ public class RulesTestCases {
         }
     }
 
-    private static void testTieBreaker_FewestDevelopmentCards() {
+    private static void testTieBreakerFewestDevelopmentCards() {
         String testName = "Tie-breaker: tied points -> player with fewer development cards wins";
 
         Player p1 = new Player("P1");
@@ -495,26 +486,23 @@ public class RulesTestCases {
         p1.addPrestigePoints(15);
         p2.addPrestigePoints(15);
 
-        // P1 has 6 dev cards
         for (int i = 0; i < 6; i++) {
             p1.addOwnedCard(makeCard(1, 0, GemColor.WHITE, 0, 0, 0, 0, 0));
         }
 
-        // P2 has 4 dev cards
         for (int i = 0; i < 4; i++) {
             p2.addOwnedCard(makeCard(3, 0, GemColor.BLUE, 0, 0, 0, 0, 0));
         }
 
         List<Player> winners = determineWinnersByOfficialTieBreak(Arrays.asList(p1, p2));
 
-        boolean correct =
-                winners.size() == 1 &&
-                winners.get(0) == p2;
+        boolean correct = winners.size() == 1 && winners.get(0) == p2;
 
-        assertTrue(testName, correct, "player with fewer development cards should win the tie");
+        assertTrue(testName, correct,
+                "player with fewer development cards should win the tie");
     }
 
-    private static void testTieBreaker_SharedVictoryIfStillTied() {
+    private static void testTieBreakerSharedVictoryIfStillTied() {
         String testName = "Tie-breaker: if still tied after card count, victory is shared";
 
         Player p1 = new Player("P1");
@@ -535,6 +523,7 @@ public class RulesTestCases {
                 winners.contains(p1) &&
                 winners.contains(p2);
 
-        assertTrue(testName, correct, "victory should be shared if points and dev-card count are both tied");
+        assertTrue(testName, correct,
+                "victory should be shared if points and dev-card count are both tied");
     }
 }
