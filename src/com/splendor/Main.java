@@ -104,12 +104,24 @@ public class Main {
 
             view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
             String input = sc.nextLine().trim();
+            
+            // --- CHANGED AREA START ---
+            // We now capture the action as a variable instead of returning immediately,
+            // so we can handle if the user returned null (meaning they want to go back).
+            Action action = null;
             switch (input) {
-                case "1": return promptTakeGems(sc, board, view);
-                case "2": return promptPurchaseCard(sc, player, board, view);
-                case "3": return promptReserveCard(sc, player, board, view);
-                default:  view.displayMessage("Enter 1, 2, or 3.");
+                case "1": action = promptTakeGems(sc, board, view); break;
+                case "2": action = promptPurchaseCard(sc, player, board, view); break;
+                case "3": action = promptReserveCard(sc, player, board, view); break;
+                default:  view.displayMessage("Enter 1, 2, or 3."); continue;
             }
+            
+            // If action is NOT null, it means the player successfully submitted an action.
+            // If action is null, the loop just restarts, effectively going back to the menu!
+            if (action != null) {
+                return action;
+            }
+            // --- CHANGED AREA END ---
         }
     }
 
@@ -121,12 +133,25 @@ public class Main {
 
         view.displayMessage("Bank: WHITE = " + gemBank[0] + " BLUE = " + gemBank[1]
                 + " GREEN = " + gemBank[2] + " RED = " + gemBank[3] + " BLACK = " + gemBank[4]);
-        view.displayMessage("Enter gems to take (e.g. 1 0 1 1 0 for WHITE GREEN RED):");
+                
+        // --- CHANGED AREA START ---
+        // Added text instructing the user to type "b" or "back"
+        view.displayMessage("Enter gems to take (e.g. 1 0 1 1 0 for WHITE GREEN RED) or type 'b' to go back:");
+        // --- CHANGED AREA END ---
 
         int[] gems = new int[5];
         while (true) {
+            String input = sc.nextLine().trim();
+            
+            // --- CHANGED AREA START ---
+            // Checking if the user typed 'b' or 'back', and mapping it to null.
+            if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
+                return null;
+            }
+            // --- CHANGED AREA END ---
+
             try {
-                String[] parts = sc.nextLine().trim().split("\\s+");
+                String[] parts = input.split("\\s+");
                 if (parts.length != 5) {
                     view.displayError("Enter exactly 5 numbers (one per color).");
                     continue;
@@ -175,9 +200,20 @@ public class Main {
         }
 
         while (true) {
-            view.displayMessage("Enter card number to buy:");
+            // --- CHANGED AREA START ---
+            // Updating the dialogue and saving input to a variable first instead of directly parsing it to an int.
+            view.displayMessage("Enter card number to buy (or type 'b' to go back):");
+            String input = sc.nextLine().trim();
+            
+            // Intercepting 'b' or 'back'
+            if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
+                return null;
+            }
+
             try {
-                int choice = Integer.parseInt(sc.nextLine().trim());
+                // Parsing the choice manually from the string we just grabbed
+                int choice = Integer.parseInt(input);
+            // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayMessage("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -212,9 +248,19 @@ public class Main {
         }
 
         while (true) {
-            view.displayMessage("Enter card number to reserve:");
+            // --- CHANGED AREA START ---
+            // Similar format to purchase card logic
+            view.displayMessage("Enter card number to reserve (or type 'b' to go back):");
+            String input = sc.nextLine().trim();
+            
+            // Intercepting 'b' or 'back'
+            if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
+                return null;
+            }
+
             try {
-                int choice = Integer.parseInt(sc.nextLine().trim());
+                int choice = Integer.parseInt(input);
+            // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayError("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -238,6 +284,5 @@ public class Main {
         view.displayMessage("Game over! " + winner.getName()
                 + " wins with " + winner.getPrestigePoints() + " prestige points!");
     }
-
-    
 }
+
