@@ -11,17 +11,34 @@ import com.splendor.core.GameEngine;
 
 public class PlayerStatusRenderer {
 
+
     public void renderPlayer(Player player, String color, boolean isCurrent) {
         String prefix = isCurrent ? ConsoleColors.BOLD + color : color;
 
-        System.out.println(prefix + "|-----------------------------");
-        System.out.println("Player: " + player.getName());
-        System.out.println("Points: " + player.getPrestigePoints());
-        System.out.println("Tokens: " + formatTokens(player));
-        System.out.println("Bonus: " + formatBonuses(player));
-        System.out.println("Cards: " + formatCards(player.getOwnedCards()));
-        System.out.println("Reserved Cards: " + formatCards(player.getReservedCards()));
-        System.out.println("-----------------------------|" + ConsoleColors.RESET);
+        // Header
+        System.out.println(prefix + "|-----------------------------" + ConsoleColors.RESET);
+        System.out.println(prefix + "Player: " + player.getName() + ConsoleColors.RESET);
+        System.out.println(prefix + "Points: " + player.getPrestigePoints() + ConsoleColors.RESET);
+        System.out.println(prefix + "Tokens: " + formatTokens(player) + ConsoleColors.RESET);
+        System.out.println(prefix + "Bonus: " + formatBonuses(player) + ConsoleColors.RESET);
+
+        BoardRenderer renderer = new BoardRenderer();
+
+        // Owned cards
+        List<DevelopmentCard> ownedCards = player.getOwnedCards();
+        if (!ownedCards.isEmpty()) {
+            System.out.println(prefix + "--- Owned Cards ---" + ConsoleColors.RESET);
+            renderCardBoxes(ownedCards, color);
+        }
+
+        // Reserved cards
+        List<DevelopmentCard> reservedCards = player.getReservedCards();
+        if (!reservedCards.isEmpty()) {
+            System.out.println(prefix + "--- Reserved Cards ---" + ConsoleColors.RESET);
+            renderCardBoxes(reservedCards, color);
+        }
+
+        System.out.println(prefix + "-----------------------------|" + ConsoleColors.RESET);
     }
 
     public void renderAllPlayers(List<Player> players, Player currentPlayer) {
@@ -116,6 +133,25 @@ public class PlayerStatusRenderer {
         }
 
         return result;
+    }
+
+    private void renderCardBoxes(List<DevelopmentCard> cards, String color) {
+        BoardRenderer renderer = new BoardRenderer();
+        List<String[]> cardBoxes = new ArrayList<>();
+
+        for (DevelopmentCard card : cards) {
+            cardBoxes.add(renderer.formatCardBox(card));
+        }
+
+        int numLines = cardBoxes.get(0).length; // typically 4 lines per box
+
+        // Print line by line
+        for (int line = 0; line < numLines; line++) {
+            for (String[] box : cardBoxes) {
+                System.out.print(color + box[line] + ConsoleColors.RESET + "  ");
+            }
+            System.out.println();
+        }
     }
 
     public String getPlayerColor(int index) {

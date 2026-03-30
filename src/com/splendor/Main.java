@@ -14,6 +14,8 @@ import com.splendor.model.Noble;
 import com.splendor.player.Player;
 import com.splendor.view.GameView;
 import com.splendor.view.PlayerStatusRenderer;
+import com.splendor.view.ConsoleColors;
+import com.splendor.view.BoardRenderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,7 +113,7 @@ public class Main {
             Action action = null;
             switch (input) {
                 case "1": action = promptTakeGems(sc, board, view); break;
-                case "2": action = promptPurchaseCard(sc, player, board, view); break;
+                case "2": action = promptPurchaseCard(sc, player, board, view, engine); break;
                 case "3": action = promptReserveCard(sc, player, board, view); break;
                 default:  view.displayMessage("Enter 1, 2, or 3."); continue;
             }
@@ -166,31 +168,99 @@ public class Main {
         }
     }
 
-    private static Action promptPurchaseCard(Scanner sc, Player player, Board board, GameView view) {
+    private static Action promptPurchaseCard(Scanner sc, Player player, Board board, GameView view, GameEngine engine) {
         // Build a numbered list of all purchasable cards
         List<DevelopmentCard> options = new ArrayList<>();
         List<Boolean> isReservedFlags = new ArrayList<>();
 
         view.displayMessage("--- Board cards ---");
+
         Map<Integer, List<DevelopmentCard>> visibleCards = board.getVisibleCards();
+
         for (int tier = 3; tier >= 1; tier--) {
+
+            // Pick tier color
+            String tierColor;
+            switch (tier) {
+                case 1: tierColor = ConsoleColors.TIER1; break;
+                case 2: tierColor = ConsoleColors.TIER2; break;
+                case 3: tierColor = ConsoleColors.TIER3; break;
+                default: tierColor = ConsoleColors.RESET;
+            }
+
             List<DevelopmentCard> tierCards = visibleCards.get(tier);
-            if (tierCards != null) {
+
+            if (tierCards != null && !tierCards.isEmpty()) {
+
+                List<String[]> cardBoxes = new ArrayList<>();
+                List<Integer> indices = new ArrayList<>();
+
                 for (DevelopmentCard card : tierCards) {
                     options.add(card);
                     isReservedFlags.add(false);
-                    view.displayMessage("[" + options.size() + "] " + card);
+
+                    // cardBoxes.add(formatCardBox(card));
+                    BoardRenderer renderer = new BoardRenderer();
+                    cardBoxes.add(renderer.formatCardBox(card));
+                    indices.add(options.size());
                 }
+
+                // Print index line (COLOURED)
+                for (int idx : indices) {
+                    System.out.print(tierColor + String.format("  [%-16d]  ", idx) + ConsoleColors.RESET);
+                }
+                System.out.println();
+
+                // Print boxes (COLOURED)
+                for (int line = 0; line < 4; line++) {
+                    for (String[] box : cardBoxes) {
+                        System.out.print(tierColor + box[line] + ConsoleColors.RESET + "  ");
+                    }
+                    System.out.println();
+                }
+
+                System.out.println();
             }
         }
 
+
         List<DevelopmentCard> reserved = player.getReservedCards();
+
         if (!reserved.isEmpty()) {
             view.displayMessage("--- Your reserved cards ---");
+
+            List<String[]> cardBoxes = new ArrayList<>();
+            List<Integer> indices = new ArrayList<>();
+
+            // Dynamically get player color
+            int playerIndex = engine.getPlayers().indexOf(player);
+            // String reservedColor = ConsoleColors.getPlayerColor(playerIndex);
+            PlayerStatusRenderer psr = new PlayerStatusRenderer();
+            String reservedColor = psr.getPlayerColor(playerIndex);
+
+            BoardRenderer renderer = new BoardRenderer();
+
+            // Build the card boxes
             for (DevelopmentCard card : reserved) {
                 options.add(card);
                 isReservedFlags.add(true);
-                view.displayMessage("[" + options.size() + "] " + card);
+
+                cardBoxes.add(renderer.formatCardBox(card));
+                indices.add(options.size()); // the number to display above the box
+            }
+
+            // Print index line above cards
+            for (int idx : indices) {
+                System.out.print(reservedColor + String.format("  [%-16d]  ", idx) + ConsoleColors.RESET);
+            }
+            System.out.println();
+
+            // Print the card boxes line by line
+            for (int line = 0; line < cardBoxes.get(0).length; line++) {
+                for (String[] box : cardBoxes) {
+                    System.out.print(reservedColor + box[line] + ConsoleColors.RESET + "  ");
+                }
+                System.out.println();
             }
         }
 
