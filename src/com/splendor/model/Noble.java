@@ -39,7 +39,9 @@ public class Noble {
 
     @Override
     public String toString() {
-        return "Noble [name=" + name + ", points=" + points + ", requirements=" + formatRequirements() + "]";
+        return "Noble [Name:" + name + 
+        " | Points: " + points + 
+        " | Requirements: " + formatRequirements() + "]";
     }
 
     private String formatRequirements() {
@@ -47,7 +49,7 @@ public class Noble {
         for (int i = 0; i < requirementColors.size(); i++) {
             if (i > 0)
                 result.append(", ");
-            result.append(requirementColors.get(i)).append("=").append(requirementQty.get(i));
+            result.append(requirementColors.get(i)).append(" = ").append(requirementQty.get(i));
         }
         return result.toString();
     }

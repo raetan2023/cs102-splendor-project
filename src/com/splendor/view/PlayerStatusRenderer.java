@@ -33,11 +33,14 @@ public class PlayerStatusRenderer {
 
             // Highlight current player
             if (player.equals(currentPlayer)) {
-                System.out.println(ConsoleColors.BOLD + color + ">> CURRENT TURN <<" + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.BOLD + ConsoleColors.ORANGE +
+                "   👑  " +
+                "CURRENT TURN " +
+                "👑   " + ConsoleColors.RESET);
             }
 
             System.out.print(color);
-            renderPlayer(player, color, true);
+            renderPlayer(player, color, false);
             System.out.print(ConsoleColors.RESET);
         }
 
@@ -68,14 +71,16 @@ public class PlayerStatusRenderer {
 
     private String formatCards(List<DevelopmentCard> cards) {
         String result = "";
+        boolean gotAdd = false;
 
         for (DevelopmentCard card : cards) {
-            result += "[" + card.getTier() + ": +" + card.getBonusColor() + " | " + card.getPrestigePoints() + " VP] ";
+            result += "(" + card.toString() + ")" + " | ";
+            gotAdd = true;
         }
 
-        // Remove trailing space if needed
-        if (result.length() > 0) {
-            result = result.substring(0, result.length() - 1);
+        // Remove trailing " | " if needed
+        if (gotAdd) {
+            result = result.substring(0, result.length() - 3);
         }
 
         if(result.length() == 0){
@@ -102,7 +107,7 @@ public class PlayerStatusRenderer {
         // Build string
         String result = "";
         for (GemColor color : GemColor.values()) {
-            result += color + "=" + bonusMap.get(color) + " | ";
+            result += color + " = " + bonusMap.get(color) + " | ";
         }
 
         // Remove trailing " | "
@@ -115,11 +120,11 @@ public class PlayerStatusRenderer {
 
     public String getPlayerColor(int index) {
         String[] colors = {
-            ConsoleColors.GREEN,
-            ConsoleColors.BLUE,
-            ConsoleColors.MAGENTA,
-            ConsoleColors.CYAN,
-            ConsoleColors.ORANGE
+            ConsoleColors.PLAYER1,
+            ConsoleColors.PLAYER2,
+            ConsoleColors.PLAYER3,
+            ConsoleColors.PLAYER4,
+            ConsoleColors.PLAYER5
         };
         return colors[index % colors.length];
     }

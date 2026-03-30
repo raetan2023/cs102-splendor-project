@@ -37,7 +37,7 @@ public class DevelopmentCard {
                 if (!result.equals("")) {
                     result += ", ";
                 }
-                result += GemColor.values()[i] + "=" + cost[i];
+                result += GemColor.values()[i] + " = " + cost[i];
             }
         }
 
@@ -51,8 +51,8 @@ public class DevelopmentCard {
     @Override
     public String toString() {
         return "Tier " + tier
-                + " Card [points=" + points
-                + ", bonus=" + bonus
-                + ", cost=" + formatCost() + "]";
+                + " Card [Points: " + points
+                + " | Bonus: " + bonus
+                + " | Cost: " + formatCost() + "]";
     }
 }

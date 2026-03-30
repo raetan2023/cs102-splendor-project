@@ -119,8 +119,8 @@ public class Main {
             gemBank[i] = board.getGemBank()[i].getSupply();
         }
 
-        view.displayMessage("Bank: WHITE=" + gemBank[0] + " BLUE=" + gemBank[1]
-                + " GREEN=" + gemBank[2] + " RED=" + gemBank[3] + " BLACK=" + gemBank[4]);
+        view.displayMessage("Bank: WHITE = " + gemBank[0] + " BLUE = " + gemBank[1]
+                + " GREEN = " + gemBank[2] + " RED = " + gemBank[3] + " BLACK = " + gemBank[4]);
         view.displayMessage("Enter gems to take (e.g. 1 0 1 1 0 for WHITE GREEN RED):");
 
         int[] gems = new int[5];
