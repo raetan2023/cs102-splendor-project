@@ -28,26 +28,51 @@ public class BoardRenderer {
         System.out.println();
     }
 
+    // public void renderCards(Board board){
+    //     // from tiers 1 to 3
+    //     Map<Integer, List<DevelopmentCard>> allVisibleCards = board.getVisibleCards(); // <-- board keeps track of revealed cards
+        
+    //     for (int tier = 1; tier <= 3; tier++) {
+    //         System.out.print("* Tier " + tier + " *");
+    //         System.out.println();
+
+    //         // Get revealed cards for this tier
+    //         List<DevelopmentCard> visibleCards = allVisibleCards.get(tier);
+
+    //         // Print each card nicely
+    //         if (visibleCards != null) {
+    //             for (DevelopmentCard card : visibleCards) {
+    //                 System.out.print(formatCard(card) + " ");
+    //                 System.out.println();
+    //             }
+    //         }
+
+    //         System.out.println(); // %n per tier
+    //         System.out.println();
+    //     }
+    // }
+
     public void renderCards(Board board){
-        // from tiers 1 to 3
-        Map<Integer, List<DevelopmentCard>> allVisibleCards = board.getVisibleCards(); // <-- board keeps track of revealed cards
+        Map<Integer, List<DevelopmentCard>> allVisibleCards = board.getVisibleCards();
         
         for (int tier = 1; tier <= 3; tier++) {
-            System.out.print("* Tier " + tier + " *");
-            System.out.println();
-
-            // Get revealed cards for this tier
-            List<DevelopmentCard> visibleCards = allVisibleCards.get(tier);
-
-            // Print each card nicely
-            if (visibleCards != null) {
-                for (DevelopmentCard card : visibleCards) {
-                    System.out.print(formatCard(card) + " ");
-                    System.out.println();
-                }
+            // Pick color based on tier
+            String tierColor;
+            switch (tier) {
+                case 1: tierColor = ConsoleColors.TIER1; break;
+                case 2: tierColor = ConsoleColors.TIER2; break;
+                case 3: tierColor = ConsoleColors.TIER3; break;
+                default: tierColor = ConsoleColors.RESET;
             }
 
-            System.out.println(); // %n per tier
+            System.out.println(tierColor + "* Tier " + tier + " *" + ConsoleColors.RESET);
+
+            List<DevelopmentCard> visibleCards = allVisibleCards.get(tier);
+            if (visibleCards != null) {
+                for (DevelopmentCard card : visibleCards) {
+                    System.out.println(tierColor + formatCard(card) + ConsoleColors.RESET);
+                }
+            }
             System.out.println();
         }
     }
@@ -77,14 +102,24 @@ public class BoardRenderer {
         System.out.println();
     }
 
+    // public void renderNobles(Board board){
+    //     List<Noble> nobles = board.getVisibleNobles(); 
+
+    //     System.out.print("* Nobles *");
+    //     System.out.println();
+    //     for (Noble noble : nobles) {
+    //         System.out.print(formatNoble(noble) + " ");
+    //         System.out.println();
+    //     }
+    //     System.out.println();
+    // }
+
     public void renderNobles(Board board){
         List<Noble> nobles = board.getVisibleNobles(); 
 
-        System.out.print("* Nobles *");
-        System.out.println();
+        System.out.println(ConsoleColors.NOBLE + "* Nobles *" + ConsoleColors.RESET);
         for (Noble noble : nobles) {
-            System.out.print(formatNoble(noble) + " ");
-            System.out.println();
+            System.out.println(ConsoleColors.NOBLE + formatNoble(noble) + ConsoleColors.RESET);
         }
         System.out.println();
     }

@@ -96,10 +96,6 @@ public class Main {
 
     private static Action promptHumanAction(Scanner sc, Player player, Board board, GameView view, GameEngine engine) {
         while (true) {
-        
-            // PlayerStatusRenderer renderer = new PlayerStatusRenderer();
-            // String color = renderer.getPlayerColor(player, engine.getPlayers());
-            // renderer.renderPlayer(player, color, true);
 
             PlayerStatusRenderer renderer = new PlayerStatusRenderer();
             int index = engine.getPlayers().indexOf(player);  // get the player's index

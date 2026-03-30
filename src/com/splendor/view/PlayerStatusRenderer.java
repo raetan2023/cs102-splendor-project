@@ -119,7 +119,7 @@ public class PlayerStatusRenderer {
             ConsoleColors.BLUE,
             ConsoleColors.MAGENTA,
             ConsoleColors.CYAN,
-            ConsoleColors.GRAY
+            ConsoleColors.ORANGE
         };
         return colors[index % colors.length];
     }
