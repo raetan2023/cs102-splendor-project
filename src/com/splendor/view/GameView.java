@@ -150,4 +150,11 @@ public class GameView {
         }
         System.out.println();
     }
+
+    public void displayError(String message) {
+        final String RED_BOLD = "\033[1;31m";
+        final String RESET = "\033[0m";
+
+        System.out.println(RED_BOLD + message + RESET);
+    }
 }

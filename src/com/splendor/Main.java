@@ -13,6 +13,7 @@ import com.splendor.model.DevelopmentCard;
 import com.splendor.model.Noble;
 import com.splendor.player.Player;
 import com.splendor.view.GameView;
+import com.splendor.view.PlayerStatusRenderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +96,10 @@ public class Main {
 
     private static Action promptHumanAction(Scanner sc, Player player, Board board, GameView view) {
         while (true) {
+            // view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
+            PlayerStatusRenderer renderer = new PlayerStatusRenderer();
+            renderer.renderPlayer(player); // show current player's status
+
             view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
             String input = sc.nextLine().trim();
             switch (input) {
@@ -121,7 +126,7 @@ public class Main {
             try {
                 String[] parts = sc.nextLine().trim().split("\\s+");
                 if (parts.length != 5) {
-                    view.displayMessage("Enter exactly 5 numbers (one per color).");
+                    view.displayError("Enter exactly 5 numbers (one per color).");
                     continue;
                 }
                 for (int i = 0; i < 5; i++) {
@@ -129,7 +134,7 @@ public class Main {
                 }
                 return new TakeGems(gems);
             } catch (NumberFormatException e) {
-                view.displayMessage("Invalid input. Enter 5 numbers separated by spaces.");
+                view.displayError("Invalid input. Enter 5 numbers separated by spaces.");
             }
         }
     }
@@ -163,7 +168,7 @@ public class Main {
         }
 
         if (options.isEmpty()) {
-            view.displayMessage("No cards available to buy.");
+            view.displayError("No cards available to buy.");
             return null;
         }
 
@@ -200,7 +205,7 @@ public class Main {
         }
 
         if (options.isEmpty()) {
-            view.displayMessage("No cards available to reserve.");
+            view.displayError("No cards available to reserve.");
             return null;
         }
 
@@ -209,7 +214,7 @@ public class Main {
             try {
                 int choice = Integer.parseInt(sc.nextLine().trim());
                 if (choice < 1 || choice > options.size()) {
-                    view.displayMessage("Enter a number between 1 and " + options.size() + ".");
+                    view.displayError("Enter a number between 1 and " + options.size() + ".");
                     continue;
                 }
                 return new ReserveCard(options.get(choice - 1));
@@ -231,4 +236,6 @@ public class Main {
         view.displayMessage("Game over! " + winner.getName()
                 + " wins with " + winner.getPrestigePoints() + " prestige points!");
     }
+
+    
 }

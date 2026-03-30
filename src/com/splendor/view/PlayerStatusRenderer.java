@@ -2,6 +2,7 @@ package com.splendor.view;
 
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
@@ -15,6 +16,7 @@ public class PlayerStatusRenderer {
         System.out.println("Player: " + player.getName());
         System.out.println("Points: " + player.getPrestigePoints());
         System.out.println("Tokens: " + formatTokens(player));
+        System.out.println("Bonus: " + formatBonuses(player));
         System.out.println("Cards: " + formatCards(player.getOwnedCards()));
         System.out.println("Reserved Cards: " + formatCards(player.getReservedCards()));
         System.out.println("-----------------------------|");
@@ -71,6 +73,34 @@ public class PlayerStatusRenderer {
 
         if(result.length() == 0){
             result += "[0]";
+        }
+
+        return result;
+    }
+
+    private String formatBonuses(Player player) {
+        Map<GemColor, Integer> bonusMap = new HashMap<>();
+
+        // Initialize all colors to 0
+        for (GemColor color : GemColor.values()) {
+            bonusMap.put(color, 0);
+        }
+
+        // Count bonuses from owned cards
+        for (DevelopmentCard card : player.getOwnedCards()) {
+            GemColor bonus = card.getBonusColor();
+            bonusMap.put(bonus, bonusMap.get(bonus) + 1);
+        }
+
+        // Build string
+        String result = "";
+        for (GemColor color : GemColor.values()) {
+            result += color + "=" + bonusMap.get(color) + " | ";
+        }
+
+        // Remove trailing " | "
+        if (result.length() >= 3) {
+            result = result.substring(0, result.length() - 3);
         }
 
         return result;
