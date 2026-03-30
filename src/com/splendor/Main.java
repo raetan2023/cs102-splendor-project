@@ -75,7 +75,7 @@ public class Main {
 
             boolean validTurn = false;
             while (!validTurn) {
-                Action action = promptHumanAction(scanner, current, engine.getGameBoard(), view);
+                Action action = promptHumanAction(scanner, current, engine.getGameBoard(), view, engine);
                 try {
                     engine.nextTurn(action);
                     validTurn = true;
@@ -94,11 +94,17 @@ public class Main {
         scanner.close();
     }
 
-    private static Action promptHumanAction(Scanner sc, Player player, Board board, GameView view) {
+    private static Action promptHumanAction(Scanner sc, Player player, Board board, GameView view, GameEngine engine) {
         while (true) {
-            // view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
+        
+            // PlayerStatusRenderer renderer = new PlayerStatusRenderer();
+            // String color = renderer.getPlayerColor(player, engine.getPlayers());
+            // renderer.renderPlayer(player, color, true);
+
             PlayerStatusRenderer renderer = new PlayerStatusRenderer();
-            renderer.renderPlayer(player); // show current player's status
+            int index = engine.getPlayers().indexOf(player);  // get the player's index
+            String color = renderer.getPlayerColor(index);    // pass index only
+            renderer.renderPlayer(player, color, true);
 
             view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
             String input = sc.nextLine().trim();

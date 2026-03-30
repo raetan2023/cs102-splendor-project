@@ -10,32 +10,39 @@ import com.splendor.player.Player;
 import com.splendor.core.GameEngine;
 
 public class PlayerStatusRenderer {
-    public void renderPlayer(Player player) {
-        // status of 1 specific player
-        System.out.println("|-----------------------------");
+
+    public void renderPlayer(Player player, String color, boolean isCurrent) {
+        String prefix = isCurrent ? ConsoleColors.BOLD + color : color;
+
+        System.out.println(prefix + "|-----------------------------");
         System.out.println("Player: " + player.getName());
         System.out.println("Points: " + player.getPrestigePoints());
         System.out.println("Tokens: " + formatTokens(player));
         System.out.println("Bonus: " + formatBonuses(player));
         System.out.println("Cards: " + formatCards(player.getOwnedCards()));
         System.out.println("Reserved Cards: " + formatCards(player.getReservedCards()));
-        System.out.println("-----------------------------|");
+        System.out.println("-----------------------------|" + ConsoleColors.RESET);
     }
-
 
     public void renderAllPlayers(List<Player> players, Player currentPlayer) {
-    System.out.println("=== Players Status ===");
+        System.out.println("=== Players Status ===");
 
-    for (Player player : players) {
-        if (player.equals(currentPlayer)) {
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            String color = getPlayerColor(i);
+
             // Highlight current player
-            // System.out.println(">> CURRENT TURN <<");
-        }
-        renderPlayer(player);
-    }
+            if (player.equals(currentPlayer)) {
+                System.out.println(ConsoleColors.BOLD + color + ">> CURRENT TURN <<" + ConsoleColors.RESET);
+            }
 
-    displayFinish();
-}
+            System.out.print(color);
+            renderPlayer(player, color, true);
+            System.out.print(ConsoleColors.RESET);
+        }
+
+        displayFinish();
+    }
 
     public void renderScore(Player player) {
         // Display the score for 1 specific player
@@ -104,6 +111,17 @@ public class PlayerStatusRenderer {
         }
 
         return result;
+    }
+
+    public String getPlayerColor(int index) {
+        String[] colors = {
+            ConsoleColors.GREEN,
+            ConsoleColors.BLUE,
+            ConsoleColors.MAGENTA,
+            ConsoleColors.CYAN,
+            ConsoleColors.GRAY
+        };
+        return colors[index % colors.length];
     }
 
     public void displayFinish() {
