@@ -5,6 +5,7 @@ import com.splendor.core.Board;
 import com.splendor.core.GameEngine;
 import com.splendor.core.ReserveCard;
 import com.splendor.core.TakeGems;
+import com.splendor.core.PurchaseCard;
 import com.splendor.model.Deck;
 import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
@@ -24,7 +25,9 @@ public class RulesTestCases {
         printHeader();
 
         runTokenLimitTests();
+        runTokenDraftingTests();
         runReserveTests();
+        runPurchaseTests();
         runNobleTests();
         runEndGameTests();
 
@@ -525,5 +528,147 @@ public class RulesTestCases {
 
         assertTrue(testName, correct,
                 "victory should be shared if points and dev-card count are both tied");
+    }
+
+    // =========================================================
+    // 5. Token Drafting
+    // =========================================================
+
+    private static void runTokenDraftingTests() {
+        System.out.println("\n--- 5. Token Drafting ---");
+        testValidPick3DifferentTokens();
+        testInvalidPick3With2SameColoredTokens();
+        testCannotPickFromEmptyStack();
+    }
+
+    private static void testValidPick3DifferentTokens() {
+        String testName = "Drafting: can take 3 different tokens";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        TakeGems action = new TakeGems(new int[]{1, 1, 1, 0, 0});
+        assertTrue(testName, action.isValid(player, board),
+                "action should be valid when picking 3 different tokens");
+    }
+
+    private static void testInvalidPick3With2SameColoredTokens() {
+        String testName = "Drafting: cannot pick 2 same, 1 different in one turn";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        TakeGems action = new TakeGems(new int[]{2, 1, 0, 0, 0});
+        assertTrue(testName, !action.isValid(player, board),
+                "action should be invalid; can't mix a double-pick with single picks");
+    }
+
+    private static void testCannotPickFromEmptyStack() {
+        String testName = "Drafting: cannot pick from an empty token stack";
+        Board board = new Board();
+        board.getGemBank()[0].takeGems(board.getGemBank()[0].getSupply()); // empty white stack
+        Player player = new Player("P1");
+
+        TakeGems action = new TakeGems(new int[]{1, 1, 1, 0, 0});
+        assertTrue(testName, !action.isValid(player, board),
+                "action should be invalid if supply for requested token is 0");
+    }
+
+    // =========================================================
+    // 6. Purchasing Cards
+    // =========================================================
+
+    private static void runPurchaseTests() {
+        System.out.println("\n--- 6. Purchasing Cards ---");
+        testPurchaseWithGold();
+        testPurchaseWithBonusesOnly();
+        testCannotAffordCard();
+        testPurchasingReservedCard();
+        testTokensReturnedToBankButBonusesKept();
+    }
+
+    private static void testPurchaseWithGold() {
+        String testName = "Purchasing: Gold substitutes for missing tokens";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        player.addToken(GemColor.GOLD, 2);
+        player.addToken(GemColor.WHITE, 1);
+        
+        DevelopmentCard card = makeCard(1, 1, GemColor.BLUE, 3, 0, 0, 0, 0); // costs 3 white
+        PurchaseCard action = new PurchaseCard(card, false);
+        
+        assertTrue(testName, action.isValid(player, board),
+                "should be valid using 1 white and 2 gold");
+    }
+
+    private static void testPurchaseWithBonusesOnly() {
+        String testName = "Purchasing: can buy using only bonuses";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        for(int i=0; i<3; i++) player.getWallet().addBonus(0); // 3 white bonuses
+        
+        DevelopmentCard card = makeCard(1, 1, GemColor.BLUE, 3, 0, 0, 0, 0); // costs 3 white
+        PurchaseCard action = new PurchaseCard(card, false);
+        
+        assertTrue(testName, action.isValid(player, board),
+                "should be valid using 3 white bonuses");
+    }
+
+    private static void testCannotAffordCard() {
+        String testName = "Purchasing: invalid if player lacks funds";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        DevelopmentCard card = makeCard(1, 1, GemColor.BLUE, 3, 0, 0, 0, 0); // costs 3 white
+        PurchaseCard action = new PurchaseCard(card, false);
+        
+        assertTrue(testName, !action.isValid(player, board),
+                "should be invalid if player has nothing");
+    }
+
+    private static void testPurchasingReservedCard() {
+        String testName = "Purchasing: reserved card is removed from hand";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        DevelopmentCard card = makeCard(1, 1, GemColor.BLUE, 0, 0, 0, 0, 0); // costs nothing
+        player.reserve(card);
+        
+        PurchaseCard action = new PurchaseCard(card, true);
+        if(!action.isValid(player, board)) {
+             fail(testName, "action should be valid");
+             return;
+        }
+        action.takeAction(player, board);
+        
+        boolean correct = !player.getReservedCards().contains(card) && 
+                          player.getOwnedCards().contains(card);
+                          
+        assertTrue(testName, correct,
+                "card should be moved from reserved hand to owned");
+    }
+
+    private static void testTokensReturnedToBankButBonusesKept() {
+        String testName = "Purchasing: tokens return to bank, bonuses stay";
+        Board board = new Board();
+        Player player = new Player("P1");
+
+        int initialTokens = board.getGemBank()[0].getSupply(); // white stack
+
+        player.addToken(GemColor.WHITE, 1); // 1 token
+        board.getGemBank()[0].takeGems(1);
+        
+        player.getWallet().addBonus(0); // 1 bonus
+        
+        DevelopmentCard card = makeCard(1, 1, GemColor.BLUE, 2, 0, 0, 0, 0); // costs 2 white
+        PurchaseCard action = new PurchaseCard(card, false);
+        action.takeAction(player, board);
+        
+        boolean correct = player.getTokenCount(GemColor.WHITE) == 0 &&
+                          board.getGemBank()[0].getSupply() == initialTokens &&
+                          player.getWallet().getBonuses(0) == 1; // bonus remains
+                          
+        assertTrue(testName, correct,
+                "spent tokens should return; bonuses should remain");
     }
 }
