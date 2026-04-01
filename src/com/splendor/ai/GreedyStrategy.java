@@ -2,47 +2,41 @@ package com.splendor.ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.splendor.core.Action;
-import com.splendor.core.Board;
-import com.splendor.core.PurchaseCard;
-import com.splendor.core.ReserveCard;
-import com.splendor.core.TakeGems;
 import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
 public class GreedyStrategy implements Strategy {
-
     private static final int MAX_RESERVED_CARDS = 3;
     private static final int MAX_GEM_PICK = 3;
 
     @Override
-    public Action chooseAction(Player player, Board board) {
-        List<DevelopmentCard> visibleCards = getAllVisibleCards(board);
-        DevelopmentCard bestAffordable = findBestAffordableCard(player, visibleCards);
-        if (bestAffordable != null) {
-            return new PurchaseCard(bestAffordable, false);
+    public Decision chooseAction(Player player, List<DevelopmentCard> availableCards, Map<GemColor, Integer> availableGems) {
+        DevelopmentCard affordableVisible = findBestAffordableCard(player, availableCards);
+        if (affordableVisible != null) {
+            return Decision.purchase(affordableVisible);
         }
 
-        DevelopmentCard bestReservedAffordable = findBestAffordableCard(player, player.getReservedCards());
-        if (bestReservedAffordable != null) {
-            return new PurchaseCard(bestReservedAffordable, true);
+        DevelopmentCard affordableReserved = findBestAffordableCard(player, player.getReservedCards());
+        if (affordableReserved != null) {
+            return Decision.purchase(affordableReserved);
         }
 
-        DevelopmentCard bestCard = findBestCard(visibleCards);
+        DevelopmentCard bestCard = findBestCard(availableCards);
         if (bestCard != null && player.getReservedCards().size() < MAX_RESERVED_CARDS) {
-            return new ReserveCard(bestCard);
+            return Decision.reserve(bestCard);
         }
 
-        int[] gemsToTake = chooseGemsToTake(player, visibleCards, board);
-        if (hasAnyGemSelection(gemsToTake)) {
-            return new TakeGems(gemsToTake);
+        List<GemColor> gemChoice = chooseGemColors(player, availableCards, availableGems);
+        if (!gemChoice.isEmpty()) {
+            return Decision.takeGems(gemChoice);
         }
 
-        return null;
+        return Decision.pass();
     }
 
     private DevelopmentCard findBestAffordableCard(Player player, List<DevelopmentCard> cards) {
@@ -69,6 +63,10 @@ public class GreedyStrategy implements Strategy {
         return best;
     }
 
+    private boolean canAfford(Player player, DevelopmentCard card) {
+        return player.getWallet().goldNeeded(card.getCost()) <= player.getTokenCount(GemColor.GOLD);
+    }
+
     private boolean isBetterCard(DevelopmentCard candidate, DevelopmentCard currentBest) {
         if (candidate == null) {
             return false;
@@ -82,168 +80,119 @@ public class GreedyStrategy implements Strategy {
             return candidate.getPrestigePoints() > currentBest.getPrestigePoints();
         }
 
-        return candidate.getTier() < currentBest.getTier();
+        if (candidate.getTier() != currentBest.getTier()) {
+            return candidate.getTier() > currentBest.getTier();
+        }
+
+        return totalCost(candidate) < totalCost(currentBest);
     }
 
-    private boolean canAfford(Player player, DevelopmentCard card) {
-        int[] cost = card.getCost();
-        int goldNeeded = 0;
-        Map<GemColor, Integer> tokens = player.getTokens();
-        Map<GemColor, Integer> bonuses = player.getBonuses();
+    private List<GemColor> chooseGemColors(Player player, List<DevelopmentCard> availableCards,
+            Map<GemColor, Integer> availableGems) {
+        DevelopmentCard target = findClosestCard(player, availableCards);
+        if (target == null) {
+            return fallbackGemChoice(availableGems);
+        }
 
-        for (int i = 0; i < 5; i++) {
-            GemColor color = GemColor.values()[i];
-            int discountedCost = Math.max(0, cost[i] - bonuses.get(color));
-            int available = tokens.get(color);
+        List<GemColor> priority = buildGemPriority(player, target);
+        List<GemColor> chosen = new ArrayList<>();
 
-            if (available < discountedCost) {
-                goldNeeded += discountedCost - available;
+        for (GemColor color : priority) {
+            if (color == GemColor.GOLD) {
+                continue;
             }
-        }
 
-        return tokens.get(GemColor.GOLD) >= goldNeeded;
-    }
-
-    private int[] chooseGemsToTake(Player player, List<DevelopmentCard> visibleCards, Board board) {
-        DevelopmentCard targetCard = findClosestCard(player, visibleCards);
-        if (targetCard == null) {
-            return fallbackGemChoice(board);
-        }
-
-        List<GemColor> priorities = buildGemPriority(player, targetCard);
-        int[] selection = new int[5];
-        int selectedCount = 0;
-
-        if (!priorities.isEmpty()) {
-            GemColor topPriority = priorities.get(0);
-            int topNeed = gemNeed(player, targetCard, topPriority);
-            int topIndex = topPriority.ordinal();
-
-            if (topNeed >= 2 && board.getGemBank()[topIndex].canTakeTwo()) {
-                selection[topIndex] = 2;
-                return selection;
+            Integer supply = availableGems.get(color);
+            if (supply != null && supply > 0 && !chosen.contains(color)) {
+                chosen.add(color);
             }
-        }
 
-        for (GemColor color : priorities) {
-            if (selectedCount == MAX_GEM_PICK) {
+            if (chosen.size() == MAX_GEM_PICK) {
                 break;
             }
-
-            int colorIndex = color.ordinal();
-            if (color != GemColor.GOLD && board.getGemBank()[colorIndex].getSupply() > 0 && selection[colorIndex] == 0) {
-                selection[colorIndex] = 1;
-                selectedCount++;
-            }
         }
 
-        if (selectedCount > 0) {
-            return selection;
+        if (chosen.isEmpty()) {
+            return fallbackGemChoice(availableGems);
         }
 
-        return fallbackGemChoice(board);
+        return chosen;
     }
 
-    private DevelopmentCard findClosestCard(Player player, List<DevelopmentCard> visibleCards) {
+    private DevelopmentCard findClosestCard(Player player, List<DevelopmentCard> cards) {
         DevelopmentCard best = null;
-        int lowestShortfall = Integer.MAX_VALUE;
+        int bestShortfall = Integer.MAX_VALUE;
 
-        for (DevelopmentCard card : visibleCards) {
+        for (DevelopmentCard card : cards) {
             int shortfall = tokenShortfall(player, card);
-
-            if (shortfall < lowestShortfall || (shortfall == lowestShortfall && isBetterCard(card, best))) {
+            if (shortfall < bestShortfall || (shortfall == bestShortfall && isBetterCard(card, best))) {
                 best = card;
-                lowestShortfall = shortfall;
+                bestShortfall = shortfall;
             }
         }
 
         return best;
     }
 
+    private List<GemColor> buildGemPriority(Player player, DevelopmentCard target) {
+        List<GemColor> colors = new ArrayList<>();
+
+        for (GemColor color : GemColor.values()) {
+            if (color != GemColor.GOLD) {
+                colors.add(color);
+            }
+        }
+
+        Collections.sort(colors, Comparator.comparingInt((GemColor color) -> gemNeed(player, target, color)).reversed());
+        return colors;
+    }
+
+    private List<GemColor> fallbackGemChoice(Map<GemColor, Integer> availableGems) {
+        List<GemColor> chosen = new ArrayList<>();
+
+        for (GemColor color : GemColor.values()) {
+            if (color == GemColor.GOLD) {
+                continue;
+            }
+
+            Integer supply = availableGems.get(color);
+            if (supply != null && supply > 0) {
+                chosen.add(color);
+            }
+
+            if (chosen.size() == MAX_GEM_PICK) {
+                break;
+            }
+        }
+
+        return chosen;
+    }
+
     private int tokenShortfall(Player player, DevelopmentCard card) {
         int[] cost = card.getCost();
-        Map<GemColor, Integer> tokens = player.getTokens();
-        Map<GemColor, Integer> bonuses = player.getBonuses();
         int shortfall = 0;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < cost.length; i++) {
             GemColor color = GemColor.values()[i];
-            int discountedCost = Math.max(0, cost[i] - bonuses.get(color));
-            shortfall += Math.max(0, discountedCost - tokens.get(color));
+            int owned = player.getTokenCount(color) + player.getBonuses().get(color);
+            shortfall += Math.max(0, cost[i] - owned);
         }
 
         return shortfall;
     }
 
-    private List<GemColor> buildGemPriority(Player player, DevelopmentCard targetCard) {
-        List<GemColor> priorities = new ArrayList<>();
-        int[] cost = targetCard.getCost();
-        Map<GemColor, Integer> tokens = player.getTokens();
-        Map<GemColor, Integer> bonuses = player.getBonuses();
-
-        for (int i = 0; i < 5; i++) {
-            GemColor color = GemColor.values()[i];
-            int discountedCost = Math.max(0, cost[i] - bonuses.get(color));
-            int shortfall = Math.max(0, discountedCost - tokens.get(color));
-
-            if (shortfall > 0) {
-                priorities.add(color);
-            }
-        }
-
-        Collections.sort(priorities, (left, right) -> {
-            int leftNeed = gemNeed(player, targetCard, left);
-            int rightNeed = gemNeed(player, targetCard, right);
-            return rightNeed - leftNeed;
-        });
-
-        return priorities;
-    }
-
     private int gemNeed(Player player, DevelopmentCard card, GemColor color) {
-        int colorIndex = color.ordinal();
-        int[] cost = card.getCost();
-        Map<GemColor, Integer> tokens = player.getTokens();
-        Map<GemColor, Integer> bonuses = player.getBonuses();
-        int discountedCost = Math.max(0, cost[colorIndex] - bonuses.get(color));
-        return Math.max(0, discountedCost - tokens.get(color));
+        int index = color.ordinal();
+        int required = card.getCost()[index];
+        int owned = player.getTokenCount(color) + player.getBonuses().get(color);
+        return Math.max(0, required - owned);
     }
 
-    private int[] fallbackGemChoice(Board board) {
-        int[] selection = new int[5];
-        int selectedCount = 0;
-
-        for (int i = 0; i < 5; i++) {
-            if (selectedCount == MAX_GEM_PICK) {
-                break;
-            }
-
-            if (board.getGemBank()[i].getSupply() > 0) {
-                selection[i] = 1;
-                selectedCount++;
-            }
+    private int totalCost(DevelopmentCard card) {
+        int total = 0;
+        for (int cost : card.getCost()) {
+            total += cost;
         }
-
-        return selection;
-    }
-
-    private boolean hasAnyGemSelection(int[] gemsToTake) {
-        for (int count : gemsToTake) {
-            if (count > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private List<DevelopmentCard> getAllVisibleCards(Board board) {
-        List<DevelopmentCard> visibleCards = new ArrayList<>();
-
-        for (List<DevelopmentCard> tierCards : board.getVisibleCards().values()) {
-            visibleCards.addAll(tierCards);
-        }
-
-        return visibleCards;
+        return total;
     }
 }
