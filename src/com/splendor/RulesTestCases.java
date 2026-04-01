@@ -672,3 +672,4 @@ public class RulesTestCases {
                 "spent tokens should return; bonuses should remain");
     }
 }
+
