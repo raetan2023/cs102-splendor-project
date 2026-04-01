@@ -7,27 +7,36 @@ Standard indexing for all token arrays: [0] white [1] blue [2] green [3] red [4]
 
 ### `GameEngine`
 
+`GameEngine` also contains a nested public interface:
+- `NobleSelectionStrategy` with method `Noble chooseNoble(List<Noble>, Player, Board)`
+
 |Visibility|Member|Type|
 |:-:|:--|:--|
 |`-`|`players`|`List<Player>`|
-|`~`|`gameBoard`|`Board`|
+|`-`|`currentPlayerIndex`|`int`|
+|`-`|`gameBoard`|`Board`|
+|`-`|`nobleSelectionStrategy`|`GameEngine.NobleSelectionStrategy`|
+|`+`|`GameEngine(List<Player>, Board)`|Constructor|
+|`+`|`GameEngine(List<Player>, Board, NobleSelectionStrategy)`|Constructor|
 |`+`|`startGame()`|`void`|
-|`+`|`nextTurn()`|`void`|
+|`+`|`nextTurn(Action)`|`void`|
 |`+`|`checkWin()`|`boolean`|
+|`+`|`determineWinner()`|`Player`|
+|`+`|`getCurrentPlayer()`|`Player`|
 |`+`|`getPlayers()`|`List<Player>`|
-|`~`|`getGameBoard()`|`Board`|
+|`+`|`getGameBoard()`|`Board`|
 
 ### `GemPile`
 
-| Visibility | Member                   | Type      |
-| :--------: | :----------------------- | :-------- |
-|    `-`     | `supply`                 | `int`     |
-|    `+`     | `canTakeTwo()`           | `boolean` |
-|    `+`     | `takeGems()`             | `void`    |
-|    `+`     | `returnGems()`           | `void`    |
-|    `+`     | `getSupply()`            | `int`     |
+| Visibility | Member                       | Type      |
+| :--------: | :--------------------------- | :-------- |
+|    `-`     | `supply`                     | `int`     |
+|    `+`     | `canTakeTwo()`               | `boolean` |
+|    `+`     | `takeGems(count: int)`       | `void`    |
+|    `+`     | `returnGems(count: int)`     | `void`    |
+|    `+`     | `getSupply()`                | `int`     |
 
-no need setSupply() because the supply is handled through takeGems() and returnGems()
+no need setSupply() because the supply is handled through `takeGems(count)` and `returnGems(count)`
 
 ### `Board`
 
@@ -36,12 +45,15 @@ no need setSupply() because the supply is handled through takeGems() and returnG
 |    `-`     | `gemBank`                    | `GemPile[]`                           |
 |    `-`     | `goldSupply`                 | `int` (starts at 5)                   |
 |    `-`     | `allCards`                   | `Map<Integer, Deck<DevelopmentCard>>` |
+|    `-`     | `allNobles`                  | `List<Noble>`                         |
 |    `-`     | `visibleNobles`              | `List<Noble>`                         |
 |    `-`     | `visibleCards`               | `Map<Integer, List<DevelopmentCard>>` |
 |    `+`     | `revealCard(tier: int)`      | `void`                                |
 |    `+`     | `getGemBank()`               | `GemPile[]`                           |
 |    `+`     | `getGoldSupply()`            | `int`                                 |
-|    `+`     | `setGoldSupply(amount: int)` | `void`                                |
+|    `+`     | `takeGold(amount: int)`      | `void`                                |
+|    `+`     | `returnGold(amount: int)`    | `void`                                |
+|    `+`     | `getAllNobles()`             | `List<Noble>`                         |
 |    `+`     | `getVisibleNobles()`         | `List<Noble>`                         |
 |    `+`     | `getVisibleCards()`          | `Map<Integer, List<DevelopmentCard>>` |
 |    `+`     | `getAllCards()`              | `Map<Integer, Deck<DevelopmentCard>>` |
@@ -107,13 +119,16 @@ enum GemColor {
 
 |Visibility|Member|Type|
 |:-:|:--|:--|
+|`-`|`name`|`String`|
 |`-`|`requirementColors`|`List<GemColor>`|
 |`-`|`requirementQty`|`List<Integer>`|
 |`-`|`points`|`int`|
+|`+`|`getName()`|`String`|
 |`+`|`needs(p: Player)`|`boolean`|
 |`+`|`getRequirementColors()`|`List<GemColor>`|
 |`+`|`getRequirementQty()`|`List<Integer>`|
 |`+`|`getPoints()`|`int`|
+|`+`|`toString()`|`String`|
 
 ### `Deck<T>`
 
@@ -167,8 +182,20 @@ enum GemColor {
 |    `-`     | `visitedBy`                      | `List<Noble>`           |
 |    `+`     | `addPoints(points: int)`         | `void`                  |
 |    `+`     | `reserve(card: DevelopmentCard)` | `void`                  |
+|    `+`     | `reserveCard(card: DevelopmentCard)` | `boolean`           |
+|    `+`     | `removeReservedCard(card: DevelopmentCard)` | `boolean`     |
 |    `+`     | `canAfford(noble: Noble)`        | `boolean`               |
 |    `+`     | `addNoble(noble: Noble)`         | `void`                  |
+|    `+`     | `addOwnedCard(card: DevelopmentCard)` | `void`            |
+|    `+`     | `addPrestigePoints(points: int)`  | `void`                  |
+|    `+`     | `addToken(gem: GemColor, amount: int)` | `void`           |
+|    `+`     | `spendToken(gem: GemColor, amount: int)` | `void`         |
+|    `+`     | `removeToken(gem: GemColor, amount: int)` | `void`        |
+|    `+`     | `getTokenCount(gem: GemColor)`    | `int`                   |
+|    `+`     | `getTotalTokens()`                | `int`                   |
+|    `+`     | `getTokens()`                    | `Map<GemColor, Integer>`|
+|    `+`     | `getBonuses()`                   | `Map<GemColor, Integer>`|
+|    `+`     | `getNobles()`                    | `List<Noble>`           |
 |    `+`     | `getName()`                      | `String`                |
 |    `+`     | `getPrestigePoints()`            | `int`                   |
 |    `+`     | `getWallet()`                    | `PlayerAssets`          |
@@ -176,7 +203,114 @@ enum GemColor {
 |    `+`     | `getReservedCards()`             | `List<DevelopmentCard>` |
 |    `+`     | `getVisitedBy()`                 | `List<Noble>`           |
 
-> No setters for list fields — mutations go through `addPoints()`, `reserve()`, `addNoble()`.
+> No setters for list fields — mutations go through controlled methods (`addPoints`, `reserve`, `addNoble`, etc.).
+
+---
+
+## Package: `com.splendor.ai`
+
+> AI layer that chooses actions programmatically via pluggable strategies.
+
+### `AIPlayer`
+
+- extends `Player`
+- `- strategy: Strategy`
+- `+ AIPlayer(String)`
+- `+ AIPlayer(String, Strategy)`
+- `+ chooseAction(Board): Action`
+- `+ getStrategy(): Strategy`
+- `+ setStrategy(Strategy): void`
+
+### `Strategy` (interface)
+
+- `+ chooseAction(Player, List<DevelopmentCard>, Map<GemColor, Integer>): Decision`
+
+### `Decision`
+
+- nested enum `Type { PURCHASE, RESERVE, TAKE_GEMS, PASS }`
+- `- type: Type`
+- `- card: DevelopmentCard`
+- `- gemColors: List<GemColor>`
+- static factory methods: `purchase`, `reserve`, `takeGems`, `pass`
+- getters: `getType`, `getCard`, `getGemColors`
+
+### `GreedyStrategy`
+
+- implements `Strategy`
+- chooses a purchase/reserve/take_gems/pass decision according to greedy heuristics.
+
+---
+
+## Package: `com.splendor.config`
+
+> Configuration and data loading from CSV/properties files.
+
+### `GameConfig`
+
+- `- targetPrestige: int`
+- `- maxTokensPerPlayer: int`
+- `- gemCount2Players: int`
+- `- gemCount3Players: int`
+- `- gemCount4Players: int`
+- `- goldTokenCount: int`
+- `- developmentCardsPath: String`
+- `- noblesPath: String`
+- constructor with all fields
+- getters for all fields
+- `+ getGemCountForPlayers(int): int`
+
+### `ConfigLoader` (interface)
+
+- `+ load(String): GameConfig`
+
+### `PropertiesConfigLoader`
+
+- implements `ConfigLoader`
+- loads properties and returns a `GameConfig`
+
+### `CardLoader`
+
+- `+ loadCards(String): List<DevelopmentCard>`
+
+### `NobleLoader`
+
+- `+ loadNobles(String): List<Noble>`
+
+---
+
+## Package: `com.splendor.view`
+
+> Console rendering helpers for board and player status.
+
+### `BoardRenderer`
+
+- `+ renderBoard(Board)`
+- `+ renderCards(Board)`
+- `+ renderTokens(Board)`
+- `+ renderNobles(Board)`
+- formatting helpers and legend output
+
+### `ConsoleColors`
+
+- static named color constants used by renderers (`RESET`, `TIER1`, `NOBLE`, etc.)
+
+### `GameView`
+
+- fields: `BoardRenderer boardRenderer`, `PlayerStatusRenderer playerRenderer`, `GameEngine gameEngine`
+- `+ displayGame(Board, List<Player>, GameEngine)`
+- `+ displayTurn(Board, List<Player>, GameEngine)`
+- `+ displayBoard(Board)`
+- `+ displayPlayers(List<Player>, GameEngine)`
+- `+ displayCurrentPlayer(Player)`
+- `+ displayMessage(String)`
+- `+ static promptDiscard(Player, int): int[]`
+
+### `PlayerStatusRenderer`
+
+- `+ renderPlayer(Player, String, boolean)`
+- `+ renderAllPlayers(List<Player>, Player)`
+- `+ renderScore(Player)`
+- helpers for formatting tokens, cards and bonuses
 
 ---
 
@@ -204,165 +338,4 @@ enum GemColor {
 |`Action`|`Board`|Validation and execution context|
 |`GameEngine`|`Action`|Processing player moves|
 
----
 
-## UML Class Diagram
-
-```mermaid
-classDiagram
-    %% Packages
-    namespace core {
-        class GameEngine
-        class Board
-        class GemPile
-        class Action {
-            <<abstract>>
-            +isValid(player: Player, board: Board) boolean
-            +takeAction(player: Player, board: Board) void
-        }
-        class TakeGems
-        class PurchaseCard
-        class ReserveCard
-    }
-
-    namespace model {
-        class GemColor {
-            <<enumeration>>
-            WHITE
-            BLUE
-            GREEN
-            RED
-            BLACK
-            GOLD
-        }
-        class DevelopmentCard
-        class Noble
-        class Deck~T~
-    }
-
-    namespace player {
-        class Player
-        class PlayerAssets
-    }
-
-    %% Relationships - Core
-    GameEngine *-- Board : composition
-    GameEngine o-- Player : players
-    Board *-- GemPile : gemBank (x5)
-    Board o-- Noble : visibleNobles
-    Board o-- Deck : aggregates
-
-    Action <|-- TakeGems
-    Action <|-- PurchaseCard
-    Action <|-- ReserveCard
-
-    %% Relationships - Player
-    Player *-- PlayerAssets : wallet
-    Player o-- DevelopmentCard : ownedCards
-    Player o-- DevelopmentCard : reservedCards
-    Player o-- Noble : visitedBy
-
-    %% Functional Dependencies (Uses)
-    Action ..> Board : uses
-    Action ..> Player : uses
-    Player ..> Noble : checks affordability
-    DevelopmentCard ..> GemColor : has bonus
-    Noble ..> GemColor : requirements
-
-    %% Class Definitions
-    class GameEngine {
-        -List~Player~ players
-        ~Board gameBoard
-        +startGame() void
-        +nextTurn() void
-        +checkWin() boolean
-        +getPlayers() List~Player~
-        ~getGameBoard() Board
-    }
-
-    class GemPile {
-        -int supply
-        +canTakeTwo() boolean
-        +takeGems() void
-        +returnGems() void
-        +getSupply() int
-        +setSupply(supply: int) void
-    }
-
-    class Board {
-        -GemPile[] gemBank
-        -int goldSupply
-        -List~Noble~ visibleNobles
-        -Map~Integer, List~DevelopmentCard~~ visibleCards
-        +revealCard(tier: int) void
-        +getGemBank() GemPile[]
-        +getGoldSupply() int
-        +setGoldSupply(amount: int) void
-        +getVisibleNobles() List~Noble~
-        +getVisibleCards() Map~Integer, List~DevelopmentCard~~
-    }
-
-    class DevelopmentCard {
-        -int tier
-        -int points
-        -GemColor bonus
-        -int[] cost
-        +getTier() int
-        +getBonusColor() GemColor
-        +getPrestigePoints() int
-        +getCost() int[]
-        -formatCost() String
-        +toString() String
-    }
-
-    class Noble {
-        -List~GemColor~ requirementColors
-        -List~Integer~ requirementQty
-        -int points
-        +needs(p: Player) boolean
-        +getRequirementColors() List~GemColor~
-        +getRequirementQty() List~Integer~
-        +getPoints() int
-    }
-
-    class Player {
-        -String name
-        -int prestigePoints
-        -PlayerAssets wallet
-        -List~DevelopmentCard~ ownedCards
-        -List~DevelopmentCard~ reservedCards
-        -List~Noble~ visitedBy
-        +addPoints(points: int) void
-        +reserve(card: DevelopmentCard) void
-        +canAfford(noble: Noble) boolean
-        +addNoble(noble: Noble) void
-        +getName() String
-        +getPrestigePoints() int
-        +getWallet() PlayerAssets
-        +getOwnedCards() List~DevelopmentCard~
-        +getReservedCards() List~DevelopmentCard~
-        +getVisitedBy() List~Noble~
-    }
-
-    class PlayerAssets {
-        -int[] tokens
-        -int[] bonuses
-        +addToken(colorIndex: int, qty: int) void
-        +addBonus(colorIndex: int) void
-        +getNumTokens() int
-        +getTokens() int[]
-        +getTokens(colorIndex: int) int
-        +getBonuses() int[]
-        +getBonuses(colorIndex: int) int
-        +goldNeeded(cost: int[]) int
-        +aboveTenTokens() boolean
-        +getExcessCount() int
-    }
-
-    class Deck~T~ {
-        -List~T~ cards
-        +shuffle() void
-        +draw() T
-        +add(card: T) void
-    }
-```
