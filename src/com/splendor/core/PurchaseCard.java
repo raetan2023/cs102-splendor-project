@@ -1,12 +1,3 @@
-/**
- * assumptions made outside of UML:
- * DevelopmentCard has getCost(): int[]
- * Player has getWallet(): PlayerAssets
- * Player has addOwnedCard(DevelopmentCard)
- * PlayerAssets has getTokens(): int[]
- * PlayerAssets has getBonuses(): int[]
- * PlayerAssets has setTokens(int[])
- */
 
 package com.splendor.core;
 
@@ -29,7 +20,7 @@ public class PurchaseCard extends Action {
     public boolean isValid(Player player, Board board) {
         int[] cost = card.getCost();
         int goldRequired = player.getWallet().goldNeeded(cost);
-        int playerGold = player.getWallet().getGoldTokens(); // getTokens()[5] is no longer guaranteed, let's use proper method
+        int playerGold = player.getWallet().getGoldTokens(); 
         return playerGold >= goldRequired;
     }
 
@@ -37,7 +28,7 @@ public class PurchaseCard extends Action {
     public void takeAction(Player player, Board board) {
         PlayerAssets assets = player.getWallet();
 
-        // 1. Remove card from the board or reserved hand
+        // removes the card from either the reserved deck or the board, depending on where it is
         if (isReserved) {
             player.removeReservedCard(card);
         } else {
@@ -48,16 +39,16 @@ public class PurchaseCard extends Action {
             }
         }
 
-        // 2. Add card to owned cards
+        // adds card to owned cards
         player.addOwnedCard(card);
 
-        // 3. Add prestige points
+        // adds to player's prestigePoints
         player.addPoints(card.getPrestigePoints()); 
         
-        // 4. Add permanent bonus
-        assets.addBonus(card.getBonusColor().ordinal()); // getBonusColor returns GemColor. need ordinal
+        // adds bonus to player wallet
+        assets.addBonus(card.getBonusColor().ordinal()); // getBonusColor returns only GemColor, so we have to get the ordinal
 
-        // 5. Deduct tokens and return to the board supply
+        // removes tokens required for purchase from player wallet and return to board's gem supply
         int[] cost = card.getCost();
         int[] playerTokens = assets.getTokens();
         int[] bonuses = assets.getBonuses();
@@ -77,7 +68,7 @@ public class PurchaseCard extends Action {
                         playerTokens[i] = 0;
                     }
                     
-                    // Deduct gold
+                    // removes gold required for purchase from player wallet
                     for (int g = 0; g < goldNeeded; g++) {
                         assets.useGoldToken();
                         board.returnGold(1);
