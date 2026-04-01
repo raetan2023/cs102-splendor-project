@@ -72,13 +72,30 @@ public class GameEngine {
     }
 
     public boolean checkWin() {
-        // A player wins if they have 15 or more prestige points.
+        // A player wins if they have 15 or more prestige points, 
+        // but the game only ends at the end of the round (when the last player finishes their turn).
+        if (currentPlayerIndex != players.size() - 1) {
+            return false;
+        }
+
         for (Player player : players) {
             if (player.getPrestigePoints() >= 15) {
                 return true;
             }
         }
         return false;
+    }
+
+    public Player determineWinner() {
+        Player winner = players.get(0);
+        for (Player p : players) {
+            if (p.getPrestigePoints() > winner.getPrestigePoints()
+                    || (p.getPrestigePoints() == winner.getPrestigePoints()
+                            && p.getOwnedCards().size() < winner.getOwnedCards().size())) {
+                winner = p;
+            }
+        }
+        return winner;
     }
 
     public List<Player> getPlayers() {
