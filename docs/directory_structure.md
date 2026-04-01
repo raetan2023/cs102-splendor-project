@@ -2,8 +2,11 @@ cs102-splendor-project/
 │
 ├── compile.sh
 ├── run.sh
+|__ run_ai_tests.sh
+|__ run_rules_tests.sh
 ├── config.properties
 ├── README.md
+|__ .gitignore
 │
 ├── src/
 │   └── com/
@@ -38,16 +41,17 @@ cs102-splendor-project/
 │           │   ├── GameView.java
 │           │   ├── BoardRenderer.java
 │           │   └── PlayerStatusRenderer.java
+|           |   |__ ConsoleColors.java
 │           │
 │           └── config/                      ← PRD only (not in UML yet)
 │               ├── ConfigLoader.java
 │               ├── CardLoader.java
 │               └── NobleLoader.java
+|               |__ PropertiesConfigLoader.java
+|               |__ GameConfig.java
 │
 ├── data/
-│   ├── cards_level1.csv
-│   ├── cards_level2.csv
-│   ├── cards_level3.csv
+│   ├── development_cards.csv
 │   └── nobles.csv
 │
 ├── classes/                                 ← empty; populated by compile.sh
@@ -58,4 +62,5 @@ cs102-splendor-project/
     ├── PRD.md
     ├── uml_breakdown.md
     ├── git_guide.md
+    |__ Splendor Core Logic.md
     └── workflow.txt
