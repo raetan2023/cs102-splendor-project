@@ -1,4 +1,3 @@
-
 package com.splendor.core;
 
 import com.splendor.player.Player;
