@@ -8,14 +8,24 @@ import java.util.Collections;
 import java.util.List;
 
 public class GameEngine {
+    public interface NobleSelectionStrategy {
+        Noble chooseNoble(List<Noble> qualifyingNobles, Player currentPlayer, Board gameBoard);
+    }
+
     private List<Player> players;
     private Board gameBoard;
     private int currentPlayerIndex;
+    private NobleSelectionStrategy nobleSelectionStrategy;
 
     public GameEngine(List<Player> players, Board gameBoard) {
+        this(players, gameBoard, (qualifyingNobles, currentPlayer, board) -> qualifyingNobles.get(0));
+    }
+
+    public GameEngine(List<Player> players, Board gameBoard, NobleSelectionStrategy nobleSelectionStrategy) {
         this.players = players;
         this.gameBoard = gameBoard;
         this.currentPlayerIndex = 0;
+        this.nobleSelectionStrategy = nobleSelectionStrategy;
     }
 
     public void startGame() {
@@ -57,9 +67,15 @@ public class GameEngine {
         }
 
         if (!qualifyingNobles.isEmpty()) {
-            // If multiple qualify, GameView prompt should handle player choice.
-            // Assuming auto-pick first one for now as a fallback.
-            Noble visitingNoble = qualifyingNobles.get(0); 
+            Noble visitingNoble;
+            if (qualifyingNobles.size() == 1) {
+                visitingNoble = qualifyingNobles.get(0);
+            } else {
+                visitingNoble = nobleSelectionStrategy.chooseNoble(qualifyingNobles, currentPlayer, gameBoard);
+                if (visitingNoble == null || !qualifyingNobles.contains(visitingNoble)) {
+                    throw new IllegalStateException("Noble selection strategy must return one of the qualifying nobles.");
+                }
+            }
             currentPlayer.addNoble(visitingNoble);
             gameBoard.getVisibleNobles().remove(visitingNoble);
         }

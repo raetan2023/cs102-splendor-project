@@ -61,6 +61,7 @@ public class RulesTestCases {
         testNobleIsAutomaticAtEndOfTurn();
         testTokensDoNotAttractNobles();
         testOnlyOneNobleClaimedPerTurnWhenMultipleQualify();
+        testSpecificNobleChoiceWhenMultipleQualify();
     }
 
     private static void runEndGameTests() {
@@ -456,7 +457,36 @@ public class RulesTestCases {
         assertTrue(testName, correct,
                 "engine should grant only one noble when multiple qualify");
     }
+    private static void testSpecificNobleChoiceWhenMultipleQualify() {
+        String testName = "Nobles choice: player-selected noble is awarded when multiple qualify";
 
+        Player p1 = new Player("P1");
+        Player p2 = new Player("P2");
+        Board board = new Board();
+
+        Noble noble1 = makeNoble("Noble A", 3, GemColor.WHITE, 1);
+        Noble noble2 = makeNoble("Noble B", 3, GemColor.WHITE, 1);
+
+        board.getVisibleNobles().add(noble1);
+        board.getVisibleNobles().add(noble2);
+
+        p1.getWallet().addBonus(0);
+
+        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board,
+                (qualifyingNobles, currentPlayer, gameBoard) -> noble2);
+
+        engine.nextTurn(new NoOpAction());
+
+        boolean correct =
+                p1.getVisitedBy().size() == 1 &&
+                p1.getVisitedBy().contains(noble2) &&
+                !p1.getVisitedBy().contains(noble1) &&
+                board.getVisibleNobles().size() == 1 &&
+                board.getVisibleNobles().contains(noble1);
+
+        assertTrue(testName, correct,
+                "player should get chosen noble and only one noble should be claimed");
+    }
     // =========================================================
     // 4. Game End & Tie-Breakers
     // =========================================================

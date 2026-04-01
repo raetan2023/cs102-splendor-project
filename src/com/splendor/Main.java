@@ -298,6 +298,11 @@ public class Main {
     }
 
     private static Action promptReserveCard(Scanner sc, Player player, Board board, GameView view) {
+        if (player.getReservedCards().size() >= 3) {
+            view.displayError("You already have 3 reserved cards. You cannot reserve more.");
+            return null;
+        }
+
         List<DevelopmentCard> options = new ArrayList<>();
 
         view.displayMessage("--- Board cards ---");
