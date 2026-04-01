@@ -16,6 +16,7 @@ public class PurchaseCard extends Action {
     }
 
     @Override
+    // checks if player has enough tokens to make purchase 
     public boolean isValid(Player player, Board board) {
         int[] cost = card.getCost();
         int goldRequired = player.getWallet().goldNeeded(cost);
