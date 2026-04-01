@@ -331,11 +331,15 @@ enum GemColor {
 
 |Class|Depends On|Reason|
 |:--|:--|:--|
-|`Player`|`Noble`, `DevelopmentCard`|Affordability checks and inventory|
+|`Player`|`PlayerAssets`, `Noble`, `DevelopmentCard`|Wallet and bonus tracking, noble assignment and card inventory|
+|`PlayerAssets`|`GemColor`|Gem color indexing and calculations|
 |`DevelopmentCard`|`GemColor`|Bonus gem type|
 |`Noble`|`GemColor`|Cost requirement colors|
-|`Board`|`Noble`|Tracking available visitors|
-|`Action`|`Board`|Validation and execution context|
-|`GameEngine`|`Action`|Processing player moves|
+|`Board`|`GemPile`, `Deck<DevelopmentCard>`, `Noble`|Game token supply, card tiers, visible nobles|
+|`Action`|`Board`, `Player`|Validation and game-state mutation context|
+|`GameEngine`|`Action`, `Board`, `Player`, `NobleSelectionStrategy`|Game loop, turn processing, noble choice behavior|
+|`AIPlayer`|`Strategy`, `Decision`, `Board`, `Player`|Automated move decision-making based on state|
+|`ConfigLoader` / `CardLoader` / `NobleLoader`|`GameConfig`, `DevelopmentCard`, `Noble`|Data loading for game configuration and components|
+|`GameView` / `BoardRenderer` / `PlayerStatusRenderer`|`Board`, `Player`, `GameEngine`|Rendering current game state and player status|
 
 
