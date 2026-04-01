@@ -39,7 +39,7 @@ public class PurchaseCard extends Action {
 
         // 1. Remove card from the board or reserved hand
         if (isReserved) {
-            player.getReservedCards().remove(card);
+            player.removeReservedCard(card);
         } else {
             List<DevelopmentCard> tierCards = board.getVisibleCards().get(card.getTier());
             if (tierCards != null) {
