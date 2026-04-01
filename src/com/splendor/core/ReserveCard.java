@@ -1,9 +1,3 @@
-/**
- * assumptions made outside of UML:
- * Player has getWallet(): PlayerAssets
- * Player has getReservedCards(): List<DevelopmentCard>
- */
-
 package com.splendor.core;
 
 import com.splendor.player.Player;
@@ -19,21 +13,24 @@ public class ReserveCard extends Action {
     }
 
     @Override
+    // checks if limit for total number of reserved cards is exceeded, returns true if not 
     public boolean isValid(Player player, Board board) {
         return player.getReservedCards().size() < 3;
     }
 
     @Override
     public void takeAction(Player player, Board board) {
-        // Remove from board if it's there
+        // removes the card to reserve from the board if it's there
         List<DevelopmentCard> tierCards = board.getVisibleCards().get(card.getTier());
         if (tierCards != null && tierCards.contains(card)) {
             tierCards.remove(card);
-            board.revealCard(card.getTier()); // Reveal replacement
+            board.revealCard(card.getTier()); // reveals replacement of reserved card on board (makes new card face up)
         }
 
+        //adds card to player's reserved cards
         player.reserve(card);
-        
+
+        //checks if the board has any gold tokens left and adds one to player's wallet if yes, removes it from the board
         if (board.getGoldSupply() > 0) { 
             player.getWallet().addGoldToken(); 
             board.takeGold(1);
