@@ -32,6 +32,7 @@ cs102-splendor-project/
 │           │   ├── Strategy.java            (interface)
 │           │   ├── AIPlayer.java
 │           │   └── GreedyStrategy.java
+|           |   |__ Decision.java
 │           │
 │           ├── view/                        
 │           │   ├── GameView.java
