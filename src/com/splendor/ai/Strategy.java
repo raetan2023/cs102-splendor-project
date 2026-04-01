@@ -1,9 +1,11 @@
 package com.splendor.ai;
 
-import com.splendor.core.Action;
-import com.splendor.core.Board;
+import java.util.List;
+import java.util.Map;
+import com.splendor.model.DevelopmentCard;
+import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
 public interface Strategy {
-    Action chooseAction(Player player, Board board);
+    Decision chooseAction(Player player, List<DevelopmentCard> availableCards, Map<GemColor, Integer> availableGems);
 }
