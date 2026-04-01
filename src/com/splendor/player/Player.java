@@ -78,7 +78,11 @@ public class Player {
     }
 
     public List<DevelopmentCard> getReservedCards() {
-        return reservedCards;
+        return Collections.unmodifiableList(reservedCards);
+    }
+
+    public boolean removeReservedCard(DevelopmentCard card) {
+        return reservedCards.remove(card);
     }
 
     public List<Noble> getVisitedBy() {
