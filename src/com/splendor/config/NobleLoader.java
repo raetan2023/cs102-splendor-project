@@ -37,11 +37,11 @@ public class NobleLoader {
                     List<Integer> requirementQty = new ArrayList<>();
                     // this is the order defined in the noble.csv
                     GemColor[] colorOrder = {
-                        GemColor.BLACK,
+                        GemColor.WHITE,
                         GemColor.BLUE,
                         GemColor.GREEN,
                         GemColor.RED,
-                        GemColor.WHITE
+                        GemColor.BLACK
                     };
 
                     for (int i = 0; i < colorOrder.length; i++) {

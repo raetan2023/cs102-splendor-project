@@ -1,11 +1,11 @@
-Name,Points,BLACK,BLUE,GREEN,RED,WHITE
+Name,Points,WHITE,BLUE,GREEN,RED,BLACK
 Catherine,3,0,3,3,3,0
 Elisabeth,3,3,3,0,0,3
 Isabella,3,4,0,0,0,4
-Niccolò,3,0,4,0,0,4
+Niccolò,3,4,4,0,0,0
 Suleiman,3,0,4,4,0,0
-Anne,3,0,3,3,0,3
-Charles V,3,3,0,3,3,0
-Francis I,3,3,0,3,3,0
-Henry VIII,3,4,0,0,4,0
+Anne,3,3,3,3,0,0
+Charles V,3,0,0,3,3,3
+Francis I,3,0,0,3,3,3
+Henry VIII,3,0,0,0,4,4
 Mary,3,0,0,4,4,0
