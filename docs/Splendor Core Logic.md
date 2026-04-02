@@ -69,7 +69,7 @@ Noble check — not an action, not a player choice (unless multiple qualify):
 
 * For each noble in Board.visibleNobles, call noble.needs(player) → checks if player's PlayerAssets.getBonuses() meets the noble's requirementColors \+ requirementQty  
 * If a noble qualifies: call Player.addNoble(noble) (this should be implemented inside Player.addNoble(): when noble visits, add to Player.visitedBy and call Player.addPoints(3)), remove noble from Board.visibleNobles  
-* If multiple qualify: player chooses one (handled via GameView prompt)
+* If multiple qualify: pick the first qualifying noble
 
 ## **Win Check (end of round, inside GameEngine)**
 

@@ -25,22 +25,12 @@ public class Main {
         List<DevelopmentCard> tier3 = new ArrayList<>();
 
         for (DevelopmentCard card : allCards) {
-<<<<<<< HEAD
-            if (card.getTier() == 1) {
-                tier1.add(card);
-            } else if (card.getTier() == 2) {
-                tier2.add(card);
-            } else if (card.getTier() == 3) {
-                tier3.add(card);
-            }
-=======
             if (card.getTier() == 1)
                 tier1.add(card);
             else if (card.getTier() == 2)
                 tier2.add(card);
             else if (card.getTier() == 3)
                 tier3.add(card);
->>>>>>> e74756a2bbb2b4057c059fd6faa8c81c78a1faff
         }
 
         NobleLoader nobleLoader = new NobleLoader();
@@ -76,7 +66,7 @@ public class Main {
                 view.displayError("Invalid choice. Enter 1 or 2.");
             }
         }
-        
+
         List<Player> players = Arrays.asList(player1, player2);
 
         // 5. Initialize GameEngine
@@ -119,7 +109,7 @@ public class Main {
             boolean validTurn = false;
             while (!validTurn) {
                 Action action;
-                
+
                 // If the player is an AI, let it choose automatically
                 if (current instanceof com.splendor.ai.AIPlayer) {
                     view.displayMessage("\n" + current.getName() + " is thinking...");
@@ -128,15 +118,19 @@ public class Main {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
-                    
+
                     action = ((com.splendor.ai.AIPlayer) current).chooseAction(engine.getGameBoard());
-                    
+
                     // The AI returns null if it decides to PASS
                     if (action == null) {
                         view.displayMessage(current.getName() + " decides to PASS.");
                         action = new Action() {
-                            public boolean isValid(Player p, Board b) { return true; }
-                            public void takeAction(Player p, Board b) { }
+                            public boolean isValid(Player p, Board b) {
+                                return true;
+                            }
+
+                            public void takeAction(Player p, Board b) {
+                            }
                         };
                     } else {
                         view.displayMessage(current.getName() + " takes action: " + action.getClass().getSimpleName());
@@ -145,21 +139,28 @@ public class Main {
                     // Otherwise prompt the human
                     action = promptHumanAction(scanner, current, engine.getGameBoard(), view, engine);
                 }
-                
+
                 try {
                     engine.nextTurn(action);
                     validTurn = true;
                 } catch (IllegalArgumentException e) {
                     if (current instanceof com.splendor.ai.AIPlayer) {
-                        // Failsafe: if AI completely bugs out, force a pass so the game doesn't infinite loop
-                        view.displayError(current.getName() + " attempted an invalid move: " + e.getMessage() + ". Forcing skip.");
+                        // Failsafe: if AI completely bugs out, force a pass so the game doesn't
+                        // infinite loop
+                        view.displayError(current.getName() + " attempted an invalid move: " + e.getMessage()
+                                + ". Forcing skip.");
                         action = new Action() {
-                            public boolean isValid(Player p, Board b) { return true; }
-                            public void takeAction(Player p, Board b) { }
+                            public boolean isValid(Player p, Board b) {
+                                return true;
+                            }
+
+                            public void takeAction(Player p, Board b) {
+                            }
                         };
                         try {
                             engine.nextTurn(action);
-                        } catch (Exception ex) {} // suppress any further engine errors
+                        } catch (Exception ex) {
+                        } // suppress any further engine errors
                         validTurn = true;
                     } else {
                         view.displayMessage("Invalid move: " + e.getMessage() + " Try again.");
@@ -449,7 +450,7 @@ public class Main {
         for (Player p : players) {
             if (p.getPrestigePoints() > winner.getPrestigePoints()
                     || (p.getPrestigePoints() == winner.getPrestigePoints()
-                    && p.getOwnedCards().size() < winner.getOwnedCards().size())) {
+                            && p.getOwnedCards().size() < winner.getOwnedCards().size())) {
                 winner = p;
             }
         }

@@ -8,7 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class GameEngine {
-    public interface NobleSelectionStrategy {
+    public interface NobleSelectionStrategy { // will be implemented in Main. i did not want to implement it here
+                                              // because of separation of concern
         Noble chooseNoble(List<Noble> qualifyingNobles, Player currentPlayer, Board gameBoard);
     }
 
@@ -16,7 +17,6 @@ public class GameEngine {
     private Board gameBoard;
     private int currentPlayerIndex;
     private NobleSelectionStrategy nobleSelectionStrategy;
-
 
     public GameEngine(List<Player> players, Board gameBoard, NobleSelectionStrategy nobleSelectionStrategy) {
         this.players = players;
@@ -26,7 +26,7 @@ public class GameEngine {
     }
 
     public void startGame() {
-        // Setup initial board state cards
+        // set up initial board state cards
         for (int tier = 1; tier <= 3; tier++) {
             if (gameBoard.getAllCards().containsKey(tier)) {
                 gameBoard.getAllCards().get(tier).shuffle();
@@ -36,8 +36,8 @@ public class GameEngine {
             }
         }
 
-        // Setup Nobles (draw 3 for a 2-player game)
-        // Note: Nobles do not replenish when taken.
+        // set up Nobles (draw 3 for a 2-player game)
+        // nobles do not replenish when taken
         List<Noble> allNobles = gameBoard.getAllNobles();
         Collections.shuffle(allNobles); // Assuming we can shuffle the list directly
         int noblesToDeal = Math.min(3, allNobles.size());
@@ -49,13 +49,13 @@ public class GameEngine {
     public void nextTurn(Action action) throws IllegalArgumentException {
         Player currentPlayer = players.get(currentPlayerIndex);
 
-        // 1. Validate and Execute Action
+        // 1. validate and execute action
         if (!action.isValid(currentPlayer, gameBoard)) {
             throw new IllegalArgumentException("Invalid action for the current state.");
         }
         action.takeAction(currentPlayer, gameBoard);
 
-        // 2. Automatic Noble Check
+        // 2. automatic noble check
         List<Noble> qualifyingNobles = new ArrayList<>();
         for (Noble noble : gameBoard.getVisibleNobles()) {
             if (noble.needs(currentPlayer)) {
@@ -65,28 +65,32 @@ public class GameEngine {
 
         if (!qualifyingNobles.isEmpty()) {
             Noble visitingNoble;
-            if (qualifyingNobles.size() == 1) {
+            if (qualifyingNobles.size() == 1) { // if they qualify for 1 noble, they take it
                 visitingNoble = qualifyingNobles.get(0);
-            } else {
+            } else { // if they qualify for more than 1 noble, they choose which one to take. the
+                     // implementation is in Main.java. this is just to trigger the strategy and
+                     // handle exception
                 visitingNoble = nobleSelectionStrategy.chooseNoble(qualifyingNobles, currentPlayer, gameBoard);
                 if (visitingNoble == null || !qualifyingNobles.contains(visitingNoble)) {
-                    throw new IllegalStateException("Noble selection strategy must return one of the qualifying nobles.");
+                    throw new IllegalStateException(
+                            "Noble selection strategy must return one of the qualifying nobles.");
                 }
             }
             currentPlayer.addNoble(visitingNoble);
             gameBoard.getVisibleNobles().remove(visitingNoble);
         }
 
-        // 3. Win Condition Update/Check (Just triggering it to verify state)
+        // 3. win condition update/check (just triggering it to verify state)
         boolean hasWinner = checkWin();
 
-        // 4. Flip current player
+        // 4. flip current player
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
 
     public boolean checkWin() {
-        // A player wins if they have 15 or more prestige points, 
-        // but the game only ends at the end of the round (when the last player finishes their turn).
+        // a player wins if they have 15 or more prestige points,
+        // but the game only ends at the end of the round (when the last player finishes
+        // their turn).
         if (currentPlayerIndex != players.size() - 1) {
             return false;
         }
