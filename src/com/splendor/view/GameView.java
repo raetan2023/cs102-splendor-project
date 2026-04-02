@@ -1,12 +1,11 @@
 package com.splendor.view;
 
-import java.util.List;
-import java.util.Scanner;
-
 import com.splendor.core.Board;
 import com.splendor.core.GameEngine;
 import com.splendor.model.GemColor;
 import com.splendor.player.Player;
+import java.util.List;
+import java.util.Scanner;
 
 public class GameView {
 
@@ -20,8 +19,7 @@ public class GameView {
         this.playerRenderer = new PlayerStatusRenderer();
     }
 
-    // Displays the FULL game state
-    // Board board, List<Player> players
+    // Displays the FULL game state --> using all the other classes in view
     public void displayGame(Board board, List<Player> players, GameEngine gameEngine) {
         System.out.println("===== SPLENDOR GAME =====");
 
@@ -30,7 +28,7 @@ public class GameView {
         displayBoard(board);
         displayDivider();
 
-        displayPlayers(players, gameEngine);  
+        displayPlayers(players, gameEngine);
         displayCurrentPlayer(gameEngine.getCurrentPlayer());
 
         displayFinish();
@@ -77,11 +75,11 @@ public class GameView {
         Scanner scanner = new Scanner(System.in);
 
         GemColor[] colors = {
-                GemColor.WHITE,
-                GemColor.BLUE,
-                GemColor.GREEN,
-                GemColor.RED,
-                GemColor.BLACK
+            GemColor.WHITE,
+            GemColor.BLUE,
+            GemColor.GREEN,
+            GemColor.RED,
+            GemColor.BLACK
         };
 
         int[] discard = new int[colors.length];
@@ -89,10 +87,14 @@ public class GameView {
         System.out.println("Player: " + player.getName());
         System.out.println("You must discard " + amountToDiscard + " gems.");
 
+        // keep asking the player to discard till the amount entered is correct
         while (true) {
             int total = 0;
 
+            // ask the players for each gem color how much gem player wish to discard
             for (int i = 0; i < colors.length; i++) {
+
+                // keeps prompting till a valid input is received
                 while (true) {
                     try {
                         GemColor color = colors[i];
@@ -115,6 +117,8 @@ public class GameView {
                         discard[i] = input;
                         break;
 
+                        // catch when input is not int
+                        // InputMismatchException
                     } catch (Exception e) {
                         System.out.println("Invalid input.");
                         scanner.nextLine();
@@ -134,24 +138,23 @@ public class GameView {
         }
     }
 
-    // Displays a divider line
+    // Displays a divider line (*)
     public void displayDivider() {
-        // System.out.println("----------------------------------");
-        for(int i = 0; i <= 100; i++){
+        for (int i = 0; i <= 100; i++) {
             System.out.print("*");
         }
         System.out.println();
     }
 
+    // display finish line (=)
     public void displayFinish() {
-        // System.out.println("----------------------------------");
-        for(int i = 0; i <= 100; i++){
+        for (int i = 0; i <= 100; i++) {
             System.out.print("=");
         }
         System.out.println();
     }
 
-
+    // prints the error msg in red
     public void displayError(String message) {
         System.out.println(ConsoleColors.RED_BOLD + message + ConsoleColors.RESET);
     }
