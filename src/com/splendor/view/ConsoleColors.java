@@ -1,6 +1,7 @@
 package com.splendor.view;
 
 public class ConsoleColors {
+    // resets the format / colour to normal text
     public static final String RESET = "\033[0m";
 
     // Reserved for errors (still red to stand out)
