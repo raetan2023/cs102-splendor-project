@@ -1,14 +1,15 @@
 package com.splendor.config;
 
+import com.splendor.model.*;
 import java.io.*;
 import java.util.*;
-import com.splendor.model.*;
 
 public class NobleLoader {
 
     public List<Noble> loadNobles(String path) {
         List<Noble> nobles = new ArrayList<>();
 
+        // using filepath to read noble.csv 
         try (Scanner filesc = new Scanner(new File(path))) {
             if (filesc.hasNextLine()) {
                 filesc.nextLine(); // skip header
@@ -17,21 +18,24 @@ public class NobleLoader {
             while (filesc.hasNextLine()) {
                 String line = filesc.nextLine().trim();
                 if (line.isEmpty()) {
-                    continue;
+                    continue; // skip bad line
                 }
-
+                // split line into respective fields
                 String[] fields = line.split(",");
                 if (fields.length != 7) {
-                    continue;
+                    continue; // skip bad line
                 }
 
                 try {
+                    // first field is name 
                     String name = fields[0].trim();
+                    // prestigePoints worth
                     int points = Integer.parseInt(fields[1].trim());
 
+                    // instantiate a new list of GemColors and quantities to add
                     List<GemColor> requirementColors = new ArrayList<>();
                     List<Integer> requirementQty = new ArrayList<>();
-
+                    // this is the order defined in the noble.csv
                     GemColor[] colorOrder = {
                         GemColor.BLACK,
                         GemColor.BLUE,
@@ -48,7 +52,7 @@ public class NobleLoader {
                             requirementQty.add(qty);
                         }
                     }
-                    // add to list of nobles 
+                    // add processed noble to list 
                     nobles.add(new Noble(name, requirementColors, requirementQty, points));
 
                 } catch (NumberFormatException e) {
@@ -59,7 +63,7 @@ public class NobleLoader {
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Noble file not found: " + path, e);
         }
-
+        // return the list of all nobles parsed from csv
         return nobles;
     }
 }

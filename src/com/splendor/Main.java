@@ -1,35 +1,23 @@
 package com.splendor;
 
-import com.splendor.config.CardLoader;
-import com.splendor.config.NobleLoader;
-import com.splendor.core.Action;
-import com.splendor.core.Board;
-import com.splendor.core.GameEngine;
-import com.splendor.core.PurchaseCard;
-import com.splendor.core.ReserveCard;
-import com.splendor.core.TakeGems;
-import com.splendor.model.Deck;
-import com.splendor.model.DevelopmentCard;
-import com.splendor.model.Noble;
-import com.splendor.player.Player;
-import com.splendor.view.GameView;
-import com.splendor.view.PlayerStatusRenderer;
-import com.splendor.view.ConsoleColors;
-import com.splendor.view.BoardRenderer;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import com.splendor.config.*;
+import com.splendor.core.*;
+import com.splendor.model.*;
+import com.splendor.player.*;
+import com.splendor.view.*;
+import java.util.*;
 
 public class Main {
+
     public static void main(String[] args) {
         System.out.println("Loading Splendor game data...");
 
         // 1. Load Data
-        CardLoader cardLoader = new CardLoader();
-        List<DevelopmentCard> allCards = cardLoader.loadCards("data/development_cards.csv");
+        ConfigLoader configLoader = new PropertiesConfigLoader();
+        GameConfig config = configLoader.load("config.properties"); // store the properties in GameConfig
+
+        CardLoader cardLoader = new CardLoader(); // create new CardLoader
+        List<DevelopmentCard> allCards = cardLoader.loadCards(config.getDevelopmentCardsPath());
 
         // Split cards by tier
         List<DevelopmentCard> tier1 = new ArrayList<>();
@@ -37,13 +25,17 @@ public class Main {
         List<DevelopmentCard> tier3 = new ArrayList<>();
 
         for (DevelopmentCard card : allCards) {
-            if (card.getTier() == 1) tier1.add(card);
-            else if (card.getTier() == 2) tier2.add(card);
-            else if (card.getTier() == 3) tier3.add(card);
+            if (card.getTier() == 1) {
+                tier1.add(card);
+            } else if (card.getTier() == 2) {
+                tier2.add(card);
+            } else if (card.getTier() == 3) {
+                tier3.add(card);
+            }
         }
 
         NobleLoader nobleLoader = new NobleLoader();
-        List<Noble> nobles = nobleLoader.loadNobles("data/nobles.csv");
+        List<Noble> nobles = nobleLoader.loadNobles(config.getNoblesPath());
 
         // 2. Setup Board and Decks
         Board board = new Board();
@@ -126,18 +118,26 @@ public class Main {
 
             view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
             String input = sc.nextLine().trim();
-            
+
             // --- CHANGED AREA START ---
             // We now capture the action as a variable instead of returning immediately,
             // so we can handle if the user returned null (meaning they want to go back).
             Action action = null;
             switch (input) {
-                case "1": action = promptTakeGems(sc, board, view); break;
-                case "2": action = promptPurchaseCard(sc, player, board, view, engine); break;
-                case "3": action = promptReserveCard(sc, player, board, view); break;
-                default:  view.displayError("Enter 1, 2, or 3."); continue;
+                case "1":
+                    action = promptTakeGems(sc, board, view);
+                    break;
+                case "2":
+                    action = promptPurchaseCard(sc, player, board, view, engine);
+                    break;
+                case "3":
+                    action = promptReserveCard(sc, player, board, view);
+                    break;
+                default:
+                    view.displayError("Enter 1, 2, or 3.");
+                    continue;
             }
-            
+
             // If action is NOT null, it means the player successfully submitted an action.
             // If action is null, the loop just restarts, effectively going back to the menu!
             if (action != null) {
@@ -155,7 +155,7 @@ public class Main {
 
         view.displayMessage("Bank: WHITE = " + gemBank[0] + " BLUE = " + gemBank[1]
                 + " GREEN = " + gemBank[2] + " RED = " + gemBank[3] + " BLACK = " + gemBank[4]);
-                
+
         // --- CHANGED AREA START ---
         // Added text instructing the user to type "b" or "back"
         view.displayMessage("Enter gems to take (e.g. 1 0 1 1 0 for WHITE GREEN RED) or type 'b' to go back:");
@@ -164,7 +164,7 @@ public class Main {
         int[] gems = new int[5];
         while (true) {
             String input = sc.nextLine().trim();
-            
+
             // --- CHANGED AREA START ---
             // Checking if the user typed 'b' or 'back', and mapping it to null.
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
@@ -202,10 +202,17 @@ public class Main {
             // Pick tier color
             String tierColor;
             switch (tier) {
-                case 1: tierColor = ConsoleColors.TIER1; break;
-                case 2: tierColor = ConsoleColors.TIER2; break;
-                case 3: tierColor = ConsoleColors.TIER3; break;
-                default: tierColor = ConsoleColors.RESET;
+                case 1:
+                    tierColor = ConsoleColors.TIER1;
+                    break;
+                case 2:
+                    tierColor = ConsoleColors.TIER2;
+                    break;
+                case 3:
+                    tierColor = ConsoleColors.TIER3;
+                    break;
+                default:
+                    tierColor = ConsoleColors.RESET;
             }
 
             List<DevelopmentCard> tierCards = visibleCards.get(tier);
@@ -242,7 +249,6 @@ public class Main {
                 System.out.println();
             }
         }
-
 
         List<DevelopmentCard> reserved = player.getReservedCards();
 
@@ -294,7 +300,7 @@ public class Main {
             // Updating the dialogue and saving input to a variable first instead of directly parsing it to an int.
             view.displayMessage("Enter card number to buy (or type 'b' to go back):");
             String input = sc.nextLine().trim();
-            
+
             // Intercepting 'b' or 'back'
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
                 return null;
@@ -303,7 +309,7 @@ public class Main {
             try {
                 // Parsing the choice manually from the string we just grabbed
                 int choice = Integer.parseInt(input);
-            // --- CHANGED AREA END ---
+                // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayMessage("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -347,7 +353,7 @@ public class Main {
             // Similar format to purchase card logic
             view.displayMessage("Enter card number to reserve (or type 'b' to go back):");
             String input = sc.nextLine().trim();
-            
+
             // Intercepting 'b' or 'back'
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
                 return null;
@@ -355,7 +361,7 @@ public class Main {
 
             try {
                 int choice = Integer.parseInt(input);
-            // --- CHANGED AREA END ---
+                // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayError("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -372,7 +378,7 @@ public class Main {
         for (Player p : players) {
             if (p.getPrestigePoints() > winner.getPrestigePoints()
                     || (p.getPrestigePoints() == winner.getPrestigePoints()
-                            && p.getOwnedCards().size() < winner.getOwnedCards().size())) {
+                    && p.getOwnedCards().size() < winner.getOwnedCards().size())) {
                 winner = p;
             }
         }
@@ -380,4 +386,3 @@ public class Main {
                 + " wins with " + winner.getPrestigePoints() + " prestige points!");
     }
 }
-

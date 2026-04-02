@@ -1,7 +1,7 @@
 package com.splendor.config;
 
 public class GameConfig {
-
+    // these are all attributes that GameConfig stores for future reference
     private int targetPrestige;
     private int maxTokensPerPlayer;
 

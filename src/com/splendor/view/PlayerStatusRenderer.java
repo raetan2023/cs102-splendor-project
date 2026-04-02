@@ -1,13 +1,9 @@
 package com.splendor.view;
 
-import java.util.List;
-import java.util.Map;
-import java.util.*;
-
 import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
 import com.splendor.player.Player;
-import com.splendor.core.GameEngine;
+import java.util.*;
 
 public class PlayerStatusRenderer {
 
@@ -122,9 +118,9 @@ public class PlayerStatusRenderer {
         }
 
         // Build string
-        String result = "";
+        String result = " ";
         for (GemColor color : GemColor.values()) {
-            result += color + " = " + bonusMap.get(color) + " | ";
+            result += color + ": " + bonusMap.get(color) + " | ";
         }
 
         // Remove trailing " | "

@@ -1,7 +1,6 @@
 package com.splendor.config;
 
 import com.splendor.model.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -10,6 +9,7 @@ public class CardLoader {
     public List<DevelopmentCard> loadCards(String path) {
         List<DevelopmentCard> cards = new ArrayList<>();
 
+        // using filepath to read development_cards.csv 
         try (Scanner filesc = new Scanner(new File(path))) {
             if (filesc.hasNextLine()) {
                 filesc.nextLine(); // skip header
@@ -18,17 +18,20 @@ public class CardLoader {
             while (filesc.hasNextLine()) {
                 String line = filesc.nextLine().trim();
                 if (line.isEmpty()) {
-                    continue;
+                    continue; // skip bad line
                 }
 
                 String[] fields = line.split(",");
                 if (fields.length != 8) {
-                    continue;
+                    continue; // skip bad line
                 }
 
                 try {
+                    // first field is the tier 
                     int tier = Integer.parseInt(fields[0].trim());
+                    // next, each development card has a bonus GemColor
                     GemColor bonus = GemColor.valueOf(fields[1].trim().toUpperCase());
+                    // that GemColor has a certain number of PrestigePoints
                     int points = Integer.parseInt(fields[2].trim());
 
                     // create array for card cost
@@ -40,7 +43,7 @@ public class CardLoader {
                     cost[GemColor.RED.ordinal()] = Integer.parseInt(fields[6].trim());
                     cost[GemColor.WHITE.ordinal()] = Integer.parseInt(fields[7].trim());
 
-                    // add processed card to cards list 
+                    // add processed card to list 
                     cards.add(new DevelopmentCard(tier, points, bonus, cost));
 
                 } catch (IllegalArgumentException e) {
@@ -51,7 +54,7 @@ public class CardLoader {
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Card file not found: " + path, e);
         }
-
+        // return the list of all nobles parsed from csv
         return cards;
     }
 }
