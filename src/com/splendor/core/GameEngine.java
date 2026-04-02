@@ -17,9 +17,6 @@ public class GameEngine {
     private int currentPlayerIndex;
     private NobleSelectionStrategy nobleSelectionStrategy;
 
-    public GameEngine(List<Player> players, Board gameBoard) {
-        this(players, gameBoard, (qualifyingNobles, currentPlayer, board) -> qualifyingNobles.get(0));
-    }
 
     public GameEngine(List<Player> players, Board gameBoard, NobleSelectionStrategy nobleSelectionStrategy) {
         this.players = players;

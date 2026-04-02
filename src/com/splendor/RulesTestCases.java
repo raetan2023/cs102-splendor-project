@@ -396,7 +396,7 @@ public class RulesTestCases {
 
         p1.getWallet().addBonus(0);
 
-        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
+        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board, (nobles, currentPlayer, b) -> nobles.get(0));
         engine.nextTurn(new NoOpAction());
 
         boolean correct =
@@ -421,7 +421,7 @@ public class RulesTestCases {
 
         p1.addToken(GemColor.WHITE, 5);
 
-        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
+        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board, (nobles, currentPlayer, b) -> nobles.get(0));
         engine.nextTurn(new NoOpAction());
 
         boolean correct =
@@ -447,7 +447,7 @@ public class RulesTestCases {
 
         p1.getWallet().addBonus(0);
 
-        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
+        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board, (nobles, currentPlayer, b) -> nobles.get(0));
         engine.nextTurn(new NoOpAction());
 
         boolean correct =
@@ -497,7 +497,7 @@ public class RulesTestCases {
         Player p1 = new Player("P1");
         Player p2 = new Player("P2");
         Board board = new Board();
-        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board);
+        GameEngine engine = new GameEngine(Arrays.asList(p1, p2), board, (nobles, currentPlayer, b) -> nobles.get(0));
 
         p1.addPrestigePoints(15);
 

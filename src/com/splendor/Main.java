@@ -57,18 +57,38 @@ public class Main {
         Player player2 = new Player("Player 2");
         List<Player> players = Arrays.asList(player1, player2);
 
-        // 4. Initialize GameEngine
-        GameEngine engine = new GameEngine(players, board);
+        // 4. Initialize GameView & Scanner for interactive prompts
+        GameView view = new GameView();
+        Scanner scanner = new Scanner(System.in);
+
+        // 5. Initialize GameEngine
+        GameEngine engine = new GameEngine(players, board, (qualifyingNobles, player, b) -> {
+            view.displayMessage(player.getName() + " qualifies for multiple nobles! Choose one:");
+            for (int i = 0; i < qualifyingNobles.size(); i++) {
+                view.displayMessage("[" + (i + 1) + "] " + qualifyingNobles.get(i).toString());
+            }
+            while (true) {
+                view.displayMessage("Enter noble number to collect:");
+                String input = scanner.nextLine().trim();
+                try {
+                    int choice = Integer.parseInt(input);
+                    if (choice >= 1 && choice <= qualifyingNobles.size()) {
+                        return qualifyingNobles.get(choice - 1);
+                    }
+                    view.displayError("Enter a number between 1 and " + qualifyingNobles.size() + ".");
+                } catch (NumberFormatException e) {
+                    view.displayError("Invalid input. Enter a number.");
+                }
+            }
+        });
         engine.startGame(); // Deals nobles and initial cards
 
-        // 5. Initialize GameView & Display Initial State
-        GameView view = new GameView();
+        // Display Initial State
         view.displayGame(engine.getGameBoard(), engine.getPlayers(), engine);
 
         System.out.println("\nSplendor setup complete! Starting the game.\n");
 
         // 6. Main game loop
-        Scanner scanner = new Scanner(System.in);
         boolean gameOver = false;
 
         while (!gameOver) {

@@ -19,7 +19,7 @@ public class Board {
 
     public Board() {
         gemBank = new GemPile[5];
-        // Initialize 5 gem piles (White, Blue, Green, Red, Black) to 4 tokens each
+        // initialise 5 gem piles (white, blue, green, red, black) to 4 tokens each. acronym: WUGRK
         for (int i = 0; i < 5; i++) {
             gemBank[i] = new GemPile(4);
         }
