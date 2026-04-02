@@ -1,3 +1,4 @@
+//Generated using Gemini 3.1 Pro on Google Antigravity, double checked testing logic using Github Copilot before reviewing manually
 package com.splendor;
 
 import java.util.ArrayList;
