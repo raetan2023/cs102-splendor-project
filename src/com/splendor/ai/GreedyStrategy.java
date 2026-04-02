@@ -120,10 +120,20 @@ public class GreedyStrategy implements Strategy {
     private List<GemColor> chooseGemColors(Player player, List<DevelopmentCard> availableCards,
             Map<GemColor, Integer> availableGems) {
 
+        int currentTotalTokens = 0;
+        for (int tokens : player.getWallet().getTokens()) {
+            currentTotalTokens += tokens;
+        }
+        int maxGemsWeCanTake = Math.min(MAX_GEM_PICK, 10 - currentTotalTokens);
+
+        if (maxGemsWeCanTake <= 0) {
+            return new ArrayList<>();
+        }
+
         // Find the card we're closest to being able to afford
         DevelopmentCard target = findClosestCard(player, availableCards);
         if (target == null) {
-            return fallbackGemChoice(availableGems);
+            return fallbackGemChoice(availableGems, maxGemsWeCanTake);
         }
 
         // Sort colors by how badly we need them for that card, then take the top available ones
@@ -138,11 +148,11 @@ public class GreedyStrategy implements Strategy {
                 chosen.add(color);
             }
 
-            if (chosen.size() == MAX_GEM_PICK) break;
+            if (chosen.size() == maxGemsWeCanTake) break;
         }
 
         if (chosen.isEmpty()) {
-            return fallbackGemChoice(availableGems);
+            return fallbackGemChoice(availableGems, maxGemsWeCanTake);
         }
 
         return chosen;
@@ -188,7 +198,7 @@ public class GreedyStrategy implements Strategy {
      * No target card in sight — just take the first 3 available colors we find.
      * Better than passing even if it's not optimal.
      */
-    private List<GemColor> fallbackGemChoice(Map<GemColor, Integer> availableGems) {
+    private List<GemColor> fallbackGemChoice(Map<GemColor, Integer> availableGems, int maxGemsWeCanTake) {
         List<GemColor> chosen = new ArrayList<>();
 
         for (GemColor color : GemColor.values()) {
@@ -199,7 +209,7 @@ public class GreedyStrategy implements Strategy {
                 chosen.add(color);
             }
 
-            if (chosen.size() == MAX_GEM_PICK) break;
+            if (chosen.size() == maxGemsWeCanTake) break;
         }
 
         return chosen;

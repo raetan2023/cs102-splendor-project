@@ -37,9 +37,12 @@ public class Main {
         List<DevelopmentCard> tier3 = new ArrayList<>();
 
         for (DevelopmentCard card : allCards) {
-            if (card.getTier() == 1) tier1.add(card);
-            else if (card.getTier() == 2) tier2.add(card);
-            else if (card.getTier() == 3) tier3.add(card);
+            if (card.getTier() == 1)
+                tier1.add(card);
+            else if (card.getTier() == 2)
+                tier2.add(card);
+            else if (card.getTier() == 3)
+                tier3.add(card);
         }
 
         NobleLoader nobleLoader = new NobleLoader();
@@ -54,14 +57,34 @@ public class Main {
 
         // 3. Setup Players
         Player player1 = new Player("Player 1");
-        Player player2 = new Player("Player 2");
-        List<Player> players = Arrays.asList(player1, player2);
+        Player player2;
 
         // 4. Initialize GameView & Scanner for interactive prompts
         GameView view = new GameView();
         Scanner scanner = new Scanner(System.in);
 
+        view.displayMessage("\nChoose game mode:\n[1] Player vs Player\n[2] Player vs AI");
+        while (true) {
+            String modeInput = scanner.nextLine().trim();
+            if (modeInput.equals("1")) {
+                player2 = new Player("Player 2");
+                view.displayMessage("Mode: Player vs Player selected.");
+                break;
+            } else if (modeInput.equals("2")) {
+                player2 = new com.splendor.ai.AIPlayer("Bot");
+                view.displayMessage("Mode: Player vs AI selected.");
+                break;
+            } else {
+                view.displayError("Invalid choice. Enter 1 or 2.");
+            }
+        }
+        
+        List<Player> players = Arrays.asList(player1, player2);
+
         // 5. Initialize GameEngine
+        // the lambda function below implements NobleSelectionStrategy from GameEngine
+        // separation of concerns: GameEngine only handles the rules of the game and
+        // should not know anything about the Scanner
         GameEngine engine = new GameEngine(players, board, (qualifyingNobles, player, b) -> {
             view.displayMessage(player.getName() + " qualifies for multiple nobles! Choose one:");
             for (int i = 0; i < qualifyingNobles.size(); i++) {
@@ -97,12 +120,52 @@ public class Main {
 
             boolean validTurn = false;
             while (!validTurn) {
-                Action action = promptHumanAction(scanner, current, engine.getGameBoard(), view, engine);
+                Action action;
+                
+                // If the player is an AI, let it choose automatically
+                if (current instanceof com.splendor.ai.AIPlayer) {
+                    view.displayMessage("\n" + current.getName() + " is thinking...");
+                    try {
+                        Thread.sleep(1500); // Small delay to let user see what's happening
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    
+                    action = ((com.splendor.ai.AIPlayer) current).chooseAction(engine.getGameBoard());
+                    
+                    // The AI returns null if it decides to PASS
+                    if (action == null) {
+                        view.displayMessage(current.getName() + " decides to PASS.");
+                        action = new Action() {
+                            public boolean isValid(Player p, Board b) { return true; }
+                            public void takeAction(Player p, Board b) { }
+                        };
+                    } else {
+                        view.displayMessage(current.getName() + " takes action: " + action.getClass().getSimpleName());
+                    }
+                } else {
+                    // Otherwise prompt the human
+                    action = promptHumanAction(scanner, current, engine.getGameBoard(), view, engine);
+                }
+                
                 try {
                     engine.nextTurn(action);
                     validTurn = true;
                 } catch (IllegalArgumentException e) {
-                    view.displayMessage("Invalid move: " + e.getMessage() + " Try again.");
+                    if (current instanceof com.splendor.ai.AIPlayer) {
+                        // Failsafe: if AI completely bugs out, force a pass so the game doesn't infinite loop
+                        view.displayError(current.getName() + " attempted an invalid move: " + e.getMessage() + ". Forcing skip.");
+                        action = new Action() {
+                            public boolean isValid(Player p, Board b) { return true; }
+                            public void takeAction(Player p, Board b) { }
+                        };
+                        try {
+                            engine.nextTurn(action);
+                        } catch (Exception ex) {} // suppress any further engine errors
+                        validTurn = true;
+                    } else {
+                        view.displayMessage("Invalid move: " + e.getMessage() + " Try again.");
+                    }
                 }
             }
 
@@ -120,26 +183,35 @@ public class Main {
         while (true) {
 
             PlayerStatusRenderer renderer = new PlayerStatusRenderer();
-            int index = engine.getPlayers().indexOf(player);  // get the player's index
-            String color = renderer.getPlayerColor(index);    // pass index only
+            int index = engine.getPlayers().indexOf(player); // get the player's index
+            String color = renderer.getPlayerColor(index); // pass index only
             renderer.renderPlayer(player, color, true);
 
             view.displayMessage(player.getName() + " — choose: (1) Take Gems  (2) Buy Card  (3) Reserve Card");
             String input = sc.nextLine().trim();
-            
+
             // --- CHANGED AREA START ---
             // We now capture the action as a variable instead of returning immediately,
             // so we can handle if the user returned null (meaning they want to go back).
             Action action = null;
             switch (input) {
-                case "1": action = promptTakeGems(sc, board, view); break;
-                case "2": action = promptPurchaseCard(sc, player, board, view, engine); break;
-                case "3": action = promptReserveCard(sc, player, board, view); break;
-                default:  view.displayError("Enter 1, 2, or 3."); continue;
+                case "1":
+                    action = promptTakeGems(sc, board, view);
+                    break;
+                case "2":
+                    action = promptPurchaseCard(sc, player, board, view, engine);
+                    break;
+                case "3":
+                    action = promptReserveCard(sc, player, board, view);
+                    break;
+                default:
+                    view.displayError("Enter 1, 2, or 3.");
+                    continue;
             }
-            
+
             // If action is NOT null, it means the player successfully submitted an action.
-            // If action is null, the loop just restarts, effectively going back to the menu!
+            // If action is null, the loop just restarts, effectively going back to the
+            // menu!
             if (action != null) {
                 return action;
             }
@@ -155,7 +227,7 @@ public class Main {
 
         view.displayMessage("Bank: WHITE = " + gemBank[0] + " BLUE = " + gemBank[1]
                 + " GREEN = " + gemBank[2] + " RED = " + gemBank[3] + " BLACK = " + gemBank[4]);
-                
+
         // --- CHANGED AREA START ---
         // Added text instructing the user to type "b" or "back"
         view.displayMessage("Enter gems to take (e.g. 1 0 1 1 0 for WHITE GREEN RED) or type 'b' to go back:");
@@ -164,7 +236,7 @@ public class Main {
         int[] gems = new int[5];
         while (true) {
             String input = sc.nextLine().trim();
-            
+
             // --- CHANGED AREA START ---
             // Checking if the user typed 'b' or 'back', and mapping it to null.
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
@@ -202,10 +274,17 @@ public class Main {
             // Pick tier color
             String tierColor;
             switch (tier) {
-                case 1: tierColor = ConsoleColors.TIER1; break;
-                case 2: tierColor = ConsoleColors.TIER2; break;
-                case 3: tierColor = ConsoleColors.TIER3; break;
-                default: tierColor = ConsoleColors.RESET;
+                case 1:
+                    tierColor = ConsoleColors.TIER1;
+                    break;
+                case 2:
+                    tierColor = ConsoleColors.TIER2;
+                    break;
+                case 3:
+                    tierColor = ConsoleColors.TIER3;
+                    break;
+                default:
+                    tierColor = ConsoleColors.RESET;
             }
 
             List<DevelopmentCard> tierCards = visibleCards.get(tier);
@@ -242,7 +321,6 @@ public class Main {
                 System.out.println();
             }
         }
-
 
         List<DevelopmentCard> reserved = player.getReservedCards();
 
@@ -291,10 +369,11 @@ public class Main {
 
         while (true) {
             // --- CHANGED AREA START ---
-            // Updating the dialogue and saving input to a variable first instead of directly parsing it to an int.
+            // Updating the dialogue and saving input to a variable first instead of
+            // directly parsing it to an int.
             view.displayMessage("Enter card number to buy (or type 'b' to go back):");
             String input = sc.nextLine().trim();
-            
+
             // Intercepting 'b' or 'back'
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
                 return null;
@@ -303,7 +382,7 @@ public class Main {
             try {
                 // Parsing the choice manually from the string we just grabbed
                 int choice = Integer.parseInt(input);
-            // --- CHANGED AREA END ---
+                // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayMessage("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -347,7 +426,7 @@ public class Main {
             // Similar format to purchase card logic
             view.displayMessage("Enter card number to reserve (or type 'b' to go back):");
             String input = sc.nextLine().trim();
-            
+
             // Intercepting 'b' or 'back'
             if (input.equalsIgnoreCase("b") || input.equalsIgnoreCase("back")) {
                 return null;
@@ -355,7 +434,7 @@ public class Main {
 
             try {
                 int choice = Integer.parseInt(input);
-            // --- CHANGED AREA END ---
+                // --- CHANGED AREA END ---
                 if (choice < 1 || choice > options.size()) {
                     view.displayError("Enter a number between 1 and " + options.size() + ".");
                     continue;
@@ -380,4 +459,3 @@ public class Main {
                 + " wins with " + winner.getPrestigePoints() + " prestige points!");
     }
 }
-
