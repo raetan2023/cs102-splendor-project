@@ -1,3 +1,4 @@
+# Generated using Gemini 3.1 Pro on Google Antigravity
 #!/bin/bash
 # Move to the directory where this script is located
 cd "$(dirname "$0")"
