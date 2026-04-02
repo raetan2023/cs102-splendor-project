@@ -7,8 +7,11 @@ import java.util.*;
 
 public class PlayerStatusRenderer {
 
-
+    // display player status for only 1 player
     public void renderPlayer(Player player, String color, boolean isCurrent) {
+        //color --> player's colour 
+        
+        // decides the format
         String prefix = isCurrent ? ConsoleColors.BOLD + color : color;
 
         // Header
@@ -37,6 +40,8 @@ public class PlayerStatusRenderer {
         System.out.println(prefix + "-----------------------------|" + ConsoleColors.RESET);
     }
 
+    // Displays the status of ALL players
+    // taking in currentPlayer to mark which is the current player 
     public void renderAllPlayers(List<Player> players, Player currentPlayer) {
         System.out.println("=== Players Status ===");
 
@@ -66,6 +71,7 @@ public class PlayerStatusRenderer {
                 + player.getPrestigePoints() + " points");
     }
 
+    // display the num of gem the player has for each color
     private String formatTokens(Player player) {
         Map<GemColor, Integer> tokens = player.getTokens();
         String result = "";
@@ -82,27 +88,7 @@ public class PlayerStatusRenderer {
         return result;
     }
 
-    private String formatCards(List<DevelopmentCard> cards) {
-        String result = "";
-        boolean gotAdd = false;
-
-        for (DevelopmentCard card : cards) {
-            result += "(" + card.toString() + ")" + " | ";
-            gotAdd = true;
-        }
-
-        // Remove trailing " | " if needed
-        if (gotAdd) {
-            result = result.substring(0, result.length() - 3);
-        }
-
-        if(result.length() == 0){
-            result += "[0]";
-        }
-
-        return result;
-    }
-
+    // display the bonus players hv (earned from purchasing cards)
     private String formatBonuses(Player player) {
         Map<GemColor, Integer> bonusMap = new HashMap<>();
 
@@ -131,15 +117,21 @@ public class PlayerStatusRenderer {
         return result;
     }
 
+    // prints the cards in boxes
     private void renderCardBoxes(List<DevelopmentCard> cards, String color) {
+        // so that we can use the methods in BoardRenderer
         BoardRenderer renderer = new BoardRenderer();
+
         List<String[]> cardBoxes = new ArrayList<>();
 
         for (DevelopmentCard card : cards) {
+
+            //reuse mtd in other class
             cardBoxes.add(renderer.formatCardBox(card));
         }
 
-        int numLines = cardBoxes.get(0).length; // typically 4 lines per box
+        // get the length of the String[] (for a card)
+        int numLines = cardBoxes.get(0).length;     // typically 4 lines per box
 
         // Print line by line
         for (int line = 0; line < numLines; line++) {
@@ -150,6 +142,7 @@ public class PlayerStatusRenderer {
         }
     }
 
+    // used in Main to print the correct color for each player
     public String getPlayerColor(int index) {
         String[] colors = {
             ConsoleColors.PLAYER1,
