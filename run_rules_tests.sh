@@ -3,8 +3,7 @@ cd "$(dirname "$0")"
 
 echo "Running RulesTestCases..."
 java -cp classes com.splendor.RulesTestCases
-1
-fi
+
 
 echo ""
 echo "====================================="
