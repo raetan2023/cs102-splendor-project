@@ -14,12 +14,9 @@ import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
 /**
- * An AI-controlled player. It works just like a human Player under the hood,
- * but instead of waiting for user input it asks a Strategy object what to do
- * and then converts that decision into a real game Action.
- *
- * The Strategy can be swapped out at runtime (see setStrategy), so you can
- * pit different AI personalities against each other without changing this class.
+ *This represents an AI-controlled player that behaves similarly to a human player.
+ Instead of waiting for user input, it relies on a Strategy object to decide its next move it takes and then
+ translating that decision into an in-game action.
  */
 public class AIPlayer extends Player {
 
@@ -36,9 +33,9 @@ public class AIPlayer extends Player {
     }
 
     /**
-     * The main entry point called by the game engine each turn.
-     * Gathers what the AI can see, asks the strategy what to do,
-     * then converts that into a concrete Action the engine can execute.
+     * The main entry point is called by the game engine each turn.
+        This then gather what the AI can see, asks the strategy what to do,
+     * after that converts that into a concrete Action the engine can execute.
      */
     public Action chooseAction(Board board) {
         List<DevelopmentCard> availableCards = getAllVisibleCards(board);
@@ -50,8 +47,8 @@ public class AIPlayer extends Player {
 
     /**
      * Flattens the board's visible cards into one simple list.
-     * The board organises cards by tier (1/2/3), but the strategy
-     * doesn't care about that structure so we collapse it here.
+     * The board organises cards by different tiers (1/2/3), but the strategy
+     * doesn't care about that structure hence we collapse it here.
      */
     private List<DevelopmentCard> getAllVisibleCards(Board board) {
         List<DevelopmentCard> visibleCards = new ArrayList<>();
@@ -63,7 +60,7 @@ public class AIPlayer extends Player {
 
     /**
      * Reads the gem bank and returns a color → count map.
-     * Only looks at the first 5 colors (skips gold/wild — you can't just take those).
+     * Only looks at the first 5 colors (skips gold/wild — you cannot just take those).
      */
     private Map<GemColor, Integer> getAvailableGems(Board board) {
         Map<GemColor, Integer> availableGems = new HashMap<>();
@@ -107,8 +104,8 @@ public class AIPlayer extends Player {
 
     /**
      * The strategy gives us a list like [RED, RED, BLUE].
-     * The engine wants an int array indexed by gem color ordinal.
-     * This just counts how many of each color appear in the list and fills the array.
+     * The engine needs an int array where each position corresponds to a gem color’s index.
+     * This just simply counts how many of each color appear in the list and fills the array.
      */
     private Action gemsListToAction(List<GemColor> gemColors) {
         int[] gemsToTake = new int[5];
@@ -118,7 +115,7 @@ public class AIPlayer extends Player {
         return new TakeGems(gemsToTake);
     }
 
-    // Lets you inspect or hot-swap the AI's strategy (useful for testing different behaviours)
+    // allow us to inspect or hot-swap the AI's strategy which is useful for testing different behaviours
     public Strategy getStrategy() {
         return strategy;
     }
