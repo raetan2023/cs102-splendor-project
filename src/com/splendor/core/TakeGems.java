@@ -67,35 +67,34 @@ public class TakeGems extends Action {
             }
         }
 
-        // checks if token limit is reached and discards tokens using GameView, promptDiscard()
+        // Discard logic via GameView prompt for CLI
         if (wallet.aboveTenTokens()) {
-            int overLimit = 0;
-            //currentTokens is number of gems of each color that player currently has
-            int[] currentTokens = wallet.getTokens();
-
-            //finds how many tokens of each color need to be discarded
-            for (int count : currentTokens) {
-                overLimit += count;
-            }
-            overLimit -= 10;
-
-            // uses GameView to block execution and get CLI input from the player
+            // Calculates exactly how many tokens the player needs to discard
+            int overLimit = wallet.getExcessCount();
+        
+            // Using GameView to block execution and get CLI input from the player
             int[] discarded = GameView.promptDiscard(player, overLimit);
 
-            for (int i = 0; i < currentTokens.length; i++) {
-                //subtracts number of discarded tokens of each color from player's current tokens
-                currentTokens[i] -= discarded[i];
-
-                //returns discarded tokens to the board
-                if (i == 5) {
-                    board.returnGold(discarded[i]);
-                } else {
+            // Process the discard
+            // Loop thru the array of gems the user chose to discard
+            for (int i = 0; i < discarded.length; i++) {
+                // For non gold gems,
+                if(i < 5) {
+                    // Remove the discarded gem from the player's wallet
+                    wallet.addToken(i, -discarded[i]);
+                    // And then put the discarded gems back to the supply
                     gemBank[i].returnGems(discarded[i]);
+                // For gold gems,
+                } else if (i == 5) {
+                    // becos in PlayerAssets, we store gold as a separate int, we needa loop through
+                    // and call useGoldToken() for each discarded gold piece 
+                    for(int j = 0 ; j < discarded[i]; j++) {
+                        wallet.useGoldToken();
+                    }
+                    // return the discarded gold to the supply
+                    board.returnGold(discarded[i]);
                 }
             }
-            
-            //updates player's wallet with to remove discarded tokens 
-            wallet.setTokens(currentTokens);
         }
     }
 }
