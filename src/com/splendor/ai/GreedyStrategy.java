@@ -11,19 +11,19 @@ import com.splendor.model.GemColor;
 import com.splendor.player.Player;
 
 /**
- * The "just grab the best thing available right now" AI.
- * No lookahead, no planning — it always tries to buy first,
- * then reserve, then grab gems, and only passes if it's truly stuck.
+ * The "just grab the best thing available right now" bot.
+ * No lookahead, no planning which means it always tries to buy first,
+ * then reserve, then grab gems, and only passes if it is truly stuck.
  */
 public class GreedyStrategy implements Strategy {
 
-    private static final int MAX_RESERVED_CARDS = 3; // Game rule: can't hold more than 3 reserved cards
+    private static final int MAX_RESERVED_CARDS = 3; // Game rule: cannot hold more than 3 reserved cards
     private static final int MAX_GEM_PICK = 3;       // Game rule: can take at most 3 gems per turn
 
     @Override
     public Decision chooseAction(Player player, List<DevelopmentCard> availableCards, Map<GemColor, Integer> availableGems) {
 
-        // 1. Can we buy something off the board right now? Great, take the best one.
+        // 1. Can we buy something off the board right now? Yes then take the best one.
         DevelopmentCard affordableVisible = findBestAffordableCard(player, availableCards);
         if (affordableVisible != null) {
             return Decision.purchase(affordableVisible);
@@ -84,8 +84,8 @@ public class GreedyStrategy implements Strategy {
     }
 
     /**
-     * "Can afford" means: after spending all our colored gems and bonuses,
-     * the remaining gap can be covered by our gold tokens.
+     * "Can afford" refers to -> after spending all our colored gems and bonuses,
+     * the remaining gap still can be covered by our gold tokens.
      */
     private boolean canAfford(Player player, DevelopmentCard card) {
         return player.getWallet().goldNeeded(card.getCost()) <= player.getTokenCount(GemColor.GOLD);
@@ -160,7 +160,7 @@ public class GreedyStrategy implements Strategy {
 
     /**
      * Finds the card we need the fewest extra gems to afford.
-     * Ties are broken by isBetterCard so we lean toward higher-value cards.
+     * Ties are broken by isBetterCard such that we will lean toward higher-value cards.
      */
     private DevelopmentCard findClosestCard(Player player, List<DevelopmentCard> cards) {
         DevelopmentCard best = null;
@@ -195,7 +195,7 @@ public class GreedyStrategy implements Strategy {
     }
 
     /**
-     * No target card in sight — just take the first 3 available colors we find.
+     * No target card in sight so just take the first 3 available colors we find.
      * Better than passing even if it's not optimal.
      */
     private List<GemColor> fallbackGemChoice(Map<GemColor, Integer> availableGems, int maxGemsWeCanTake) {
@@ -243,7 +243,7 @@ public class GreedyStrategy implements Strategy {
         return Math.max(0, required - owned);
     }
 
-    /** Sums up all gem costs on a card — used as a tiebreaker (cheaper = easier to get). */
+    /** Sums up all gem costs on a card which is used as a tiebreaker (cheaper = easier to get). */
     private int totalCost(DevelopmentCard card) {
         int total = 0;
         for (int cost : card.getCost()) {
