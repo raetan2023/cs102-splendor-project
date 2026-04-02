@@ -10,14 +10,14 @@ public class ConsoleColors {
     // For current turn
     public static final String ORANGE = "\033[38;5;208m"; // neon orange
 
-    // Players colors (soft pastel palette)
+    // Players colors 
     public static final String PLAYER1 = "\033[38;5;219m"; // pastel pink
     public static final String PLAYER2 = "\033[38;5;159m"; // pastel blue
     public static final String PLAYER3 = "\033[38;5;183m"; // pastel lavender
     public static final String PLAYER4 = "\033[38;5;187m"; // pastel mint
     public static final String PLAYER5 = "\033[38;5;230m"; // cream / soft yellow
 
-    // Board tiers (soft pastels)
+    // Board tiers 
     public static final String TIER1 = "\033[38;5;224m"; // soft peach
     public static final String TIER2 = "\033[38;5;189m"; // light lavender
     public static final String TIER3 = "\033[38;5;195m"; // pastel pink
