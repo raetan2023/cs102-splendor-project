@@ -1,3 +1,4 @@
+# Generated using Gemini 3.1 Pro on Google Antigravity
 #!/bin/bash
 # Script to compile and run AIPlayerTestCases
 
