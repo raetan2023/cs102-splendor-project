@@ -163,7 +163,7 @@ public class Main {
                         } // suppress any further engine errors
                         validTurn = true;
                     } else {
-                        view.displayMessage("Invalid move: " + e.getMessage() + " Try again.");
+                        view.displayError("Invalid move: " + e.getMessage() + " Try again.");
                     }
                 }
             }
@@ -390,7 +390,7 @@ public class Main {
                 boolean isReserved = isReservedFlags.get(choice - 1);
                 return new PurchaseCard(selected, isReserved);
             } catch (NumberFormatException e) {
-                view.displayMessage("Invalid input. Enter a number.");
+                view.displayError("Invalid input. Enter a number.");
             }
         }
     }
@@ -440,7 +440,7 @@ public class Main {
                 }
                 return new ReserveCard(options.get(choice - 1));
             } catch (NumberFormatException e) {
-                view.displayMessage("Invalid input. Enter a number.");
+                view.displayError("Invalid input. Enter a number.");
             }
         }
     }
