@@ -7,16 +7,16 @@ import com.splendor.model.DevelopmentCard;
 import com.splendor.model.GemColor;
 
 /**
- * Represents a single action an AI player can take on their turn.
- * Think of this like a "move slip" — it records what the player decided to do
- * and any relevant details (which card, which gems, etc.).
+ * Shows a single action an AI player can take on their turn.
+ * Think of this like a "move slip" which means it records what the player decided to do
+ * and any relevant details (which card, which gems, etc).
  */
 public class Decision {
 
     // The four things a player can do on their turn
     public enum Type {
         PURCHASE,   // Buy a development card using gems
-        RESERVE,    // Hold a card for later (locks it so others can't take it)
+        RESERVE,    // Hold a card for later (locks it so others cannot take it)
         TAKE_GEMS,  // Pick up gem tokens from the board
         PASS        // Do nothing this turn
     }
@@ -38,12 +38,12 @@ public class Decision {
 
 
     /** Player is buying this card right now. No gems needed in the decision itself
-     *  (the engine handles deducting them separately). */
+     *  - the engine handles deducting them separately. */
     public static Decision purchase(DevelopmentCard card) {
         return new Decision(Type.PURCHASE, card, Collections.emptyList());
     }
 
-    /** Player is setting this card aside for later. They get a gold (wild) gem too,
+    /** Player is setting this card aside for later use. They get a gold (wild) gem too,
      *  but again the engine handles that part. */
     public static Decision reserve(DevelopmentCard card) {
         return new Decision(Type.RESERVE, card, Collections.emptyList());
@@ -60,7 +60,7 @@ public class Decision {
         return new Decision(Type.PASS, null, Collections.emptyList());
     }
 
-    //  Getters — just read-only access to what's inside the decision ---
+    //  Getters only have read-only access to what's inside the decision 
 
     public Type getType() {
         return type;
