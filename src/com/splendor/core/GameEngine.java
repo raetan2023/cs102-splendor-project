@@ -80,18 +80,15 @@ public class GameEngine {
             gameBoard.getVisibleNobles().remove(visitingNoble);
         }
 
-        // 3. win condition update/check (just triggering it to verify state)
-        boolean hasWinner = checkWin();
-
-        // 4. flip current player
+        // 3. flip current player
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
 
     public boolean checkWin() {
-        // a player wins if they have 15 or more prestige points,
-        // but the game only ends at the end of the round (when the last player finishes
-        // their turn).
-        if (currentPlayerIndex != players.size() - 1) {
+        // A round ends when every player has taken an equal amount of turns.
+        // Because nextTurn() increments currentPlayerIndex to 0 after the last player's turn,
+        // we just need to check if we're back to player 1 (index 0).
+        if (currentPlayerIndex != 0) {
             return false;
         }
 
