@@ -9,7 +9,7 @@ public class CardLoader {
     public List<DevelopmentCard> loadCards(String path) {
         List<DevelopmentCard> cards = new ArrayList<>();
 
-        // using filepath to read development_cards.csv 
+        // using filepath to read development_cards.csv
         try (Scanner filesc = new Scanner(new File(path))) {
             if (filesc.hasNextLine()) {
                 filesc.nextLine(); // skip header
@@ -27,7 +27,7 @@ public class CardLoader {
                 }
 
                 try {
-                    // first field is the tier 
+                    // first field is the tier
                     int tier = Integer.parseInt(fields[0].trim());
                     // next, each development card has a bonus GemColor
                     GemColor bonus = GemColor.valueOf(fields[1].trim().toUpperCase());
@@ -43,7 +43,7 @@ public class CardLoader {
                     cost[GemColor.RED.ordinal()] = Integer.parseInt(fields[6].trim());
                     cost[GemColor.BLACK.ordinal()] = Integer.parseInt(fields[7].trim());
 
-                    // add processed card to list 
+                    // add processed card to list
                     cards.add(new DevelopmentCard(tier, points, bonus, cost));
 
                 } catch (IllegalArgumentException e) {
@@ -54,7 +54,7 @@ public class CardLoader {
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Card file not found: " + path, e);
         }
-        // return the list of all nobles parsed from csv
+        // return the list of all development cards parsed from csv
         return cards;
     }
 }
